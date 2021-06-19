@@ -1,0 +1,56 @@
+body{
+  margin: 0;
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.ui.inverted.top.fixed.menu{
+  background: #141E30;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #243B55, #141E30);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.react-calendar {
+  font-weight:900 !important;
+  width: 100% !important;
+  border:none !important;
+  font-family: 'Montserrat', sans-serif !important;
+  box-shadow: 0 1px 2px 0 rgba(34,36, 28, .15) !important;
+} 
+
+.masthead {
+  display: flex;
+  align-items: center;
+  background-image: linear-gradient(
+          135deg,
+          rgb(24, 42, 115) 0%,
+          rgb(33, 138, 174) 69%,
+          rgb(32, 167, 172) 89%
+  ) !important;
+  height: 100vh;
+}
+
+.masthead .ui.menu .ui.button,
+.ui.menu a.ui.inverted.button {
+  margin-left: 0.5em;
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.react-calendar_month-view_days .react-calendar_navigation_label_labelText{
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.custom-font{
+  font-family: 'Montserrat', sans-serif !important;
+}

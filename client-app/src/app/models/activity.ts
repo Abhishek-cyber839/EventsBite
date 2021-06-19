@@ -4,6 +4,6 @@ export interface Activity{
     date:string,
     description:string,
     category:string,
-    city:String,
+    city:string,
     venue:string
 }

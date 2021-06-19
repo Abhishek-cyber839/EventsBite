@@ -31,7 +31,7 @@ const CrudOperations = {
     ActivitiesList: () => requests.get('/activities'),
     ActivityDetails:(id:string) => requests.get(`/activities/${id}`),
     Create:(activity:Activity) => requests.post('/activities',activity),
-    Update:(activity:Activity) => requests.put('/activities',activity),
+    Update:(id:string,activity:Activity) => requests.put(`/activities/${id}`,activity),
     Delete:(id:string) => requests.del(`/activities/${id}`),
 }
 

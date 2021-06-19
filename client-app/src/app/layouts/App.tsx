@@ -1,27 +1,33 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import { Container } from 'semantic-ui-react';
 import { NavBar } from './NavBar';
 import  Dashboard  from '../../Feautures/activities/Dashboard';
-import { LoadingComponent } from './LoadingComponent';
-import { useStore } from '../api/Stores/store';
 import { observer } from 'mobx-react-lite';
+import { Route,useLocation } from 'react-router-dom'
+import Home from '../../Feautures/activities/Home';
+import AForm from '../../Feautures/activities/AForm';
+import Details  from '../../Feautures/activities/Details';
+import '../../../src/App.css'
 
-function App () {
-  const { activityStore } = useStore();
-
-  useEffect(() => {
-    activityStore.LoadActivities()
-    // eslint-disable-next-line
-  },[])
-
-  if(activityStore.Loading) return <LoadingComponent content='Loading Activities'/>
+const App = () => {
+  const location  = useLocation();
   return (
-    <Fragment>
-      <NavBar/>
-      <Container style={{ marginTop:'4rem'}} >
-        <Dashboard />
-      </Container>
-    </Fragment>
+    <>
+      <Route exact path="/" component={Home}/>
+      <Route 
+         path={'/(.+)'}
+         render={() => (
+           <> 
+              <NavBar/>
+              <Container style={{ marginTop:'4rem'}} >
+                <Route exact path="/activities" component={Dashboard}/>
+                <Route path="/activities/:id" component={Details}/>
+                <Route key={location.key} path={["/createActivity","/manage/:id"]} component={AForm}/>
+              </Container>
+           </>
+         )}
+      />
+    </>
   );
 }
 

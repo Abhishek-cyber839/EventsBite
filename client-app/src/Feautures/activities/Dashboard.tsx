@@ -1,27 +1,50 @@
-import { Card,CardGroup,Button,Container,Grid } from "semantic-ui-react";
-import { Details } from './Details';
-import AForm from './AForm';
+import { Card,CardGroup,Button,Container,Grid,Image,Icon } from "semantic-ui-react";
 import { useStore } from "../../app/api/Stores/store";
 import { observer } from "mobx-react-lite";
+import { LoadingComponent } from '../../app/layouts/LoadingComponent';
+import { Fragment, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ActivityFilter } from "./ActivityFilter"; 
 
-export default observer(function Dashboard(){
+const Dashboard = () => {
     const { activityStore } = useStore();
+    const { LoadActivities,GroupedActivities } = activityStore;
+
+    useEffect(() => {
+       LoadActivities()
+    },[LoadActivities])
+
+    if(activityStore.InitialLoading) return <LoadingComponent content='Loading Activities'/>
+
     return(
         <Grid>
-            <Grid.Column width='10'>
-                    <CardGroup style={{ marginTop: 50}}>
-                        { activityStore.activities.map((activity:any) => (
-                            <Card>
+            <Grid.Column width='10' style={{ marginTop: 50}}>
+                { GroupedActivities.map(([group,activities]) => (
+                    <Fragment>
+                          <h5 className='custom-font'>{ group }</h5>
+                          <CardGroup>
+                          { activities.map((activity:any) => (
+                            <Card key={activity.id}>
                                 <Card.Content>
-                                    <Card.Header>{activity.title}</Card.Header>
+                                <Image
+                                    floated='right'
+                                    size='mini'
+                                    src={'/assets/user.jpeg'}
+                                    />
+                                    <Card.Header className='custom-font'>{activity.title}</Card.Header>
                                     <Card.Meta>{activity.date}</Card.Meta>
                                     <Card.Description>
-                                            {activity.description}
+                                    Posted By: <strong>Steve Bob</strong>
                                     </Card.Description>
+                                    <Card.Content extra><Icon name='user' />25 Attending</Card.Content>
+                                    <Card.Content extra><Icon name='tag' />75 available now</Card.Content>
+                                    {/* <Card.Description>
+                                            {activity.description}
+                                    </Card.Description> */}
                                 </Card.Content>
                                 <Card.Content extra>
                                     <div className='ui two buttons'>
-                                        <Button onClick={() => activityStore.editActivity(activity.id)} basic color='green'>
+                                        <Button as={Link} to={`/manage/${activity.id}`} basic color='green'>
                                         Edit
                                         </Button>
                                         <Button onClick={() => activityStore.deleteActivity(activity.id)} basic color='red'>
@@ -32,7 +55,8 @@ export default observer(function Dashboard(){
                                     <Card.Meta>Category: {activity.category}</Card.Meta>
                                     <Card.Meta>Where: {activity.city}</Card.Meta>
                                     <Card.Meta>Veneue: {activity.venue}</Card.Meta>
-                                    <Button onClick={() => activityStore.handleView(activity.id)} basic color='blue' style={{ marginTop: 12}}>
+                                    <Button as={Link} to={`/activities/${activity.id}`}
+                                              basic color='blue' style={{ marginTop: 12}}>
                                         More Info
                                     </Button>
                                 </Container>
@@ -41,11 +65,13 @@ export default observer(function Dashboard(){
                         ))
                         }           
                     </CardGroup>
+                    </Fragment>
+                ))}
             </Grid.Column>
             <Grid.Column width='6' style={{ marginTop: 50}}>
-                {activityStore.currentActivity && <Details/>}
-                {activityStore.openForm && <AForm />}
+                <ActivityFilter />
             </Grid.Column>
         </Grid>
     )
-})
+}
+export default observer(Dashboard);
