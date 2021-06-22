@@ -7,24 +7,33 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 using AutoMapper;
+using FluentValidation;
+using Application.Core;
 
 namespace Application.Features
 {
     public class EditActivity
     {
-        public class Command: IRequest{
+        public class Command: IRequest<Result<Unit>>{
             public Activity new_activity{ get; set;}
         }
 
-         public class Handler: IRequestHandler<Command>{
+         public class CommandValidator:AbstractValidator<Command>{
+            public CommandValidator(){
+                RuleFor(x => x.new_activity).SetValidator(new ActivityValidator());
+            }
+        }
+
+         public class Handler: IRequestHandler<Command,Result<Unit>>{
              private readonly DataContext _context;
              private readonly IMapper _mapper;
              public Handler(DataContext dataContext,IMapper mapper){
                  _context = dataContext;
                  _mapper = mapper;
              }
-             public async Task<Unit> Handle(Command request,CancellationToken cancellationToken){
+             public async Task<Result<Unit>> Handle(Command request,CancellationToken cancellationToken){
                  var old_activity = await _context.Activities.FindAsync(request.new_activity.Id);
+                 if(old_activity == null) return null;
                  /** 
                  With _mapper.Map(request.old_activity,activity) we are using CreateMap<param 1,param 2>(); from Mappingprofiles
                  which will help us assigning each new value to an old one rather than updating each one manually for ex.
@@ -32,8 +41,9 @@ namespace Application.Features
                  old_activity.city = request.new_activity.city etc....
                  **/
                  _mapper.Map(request.new_activity,old_activity);
-                 await _context.SaveChangesAsync();
-                 return Unit.Value;
+                 var result = await _context.SaveChangesAsync() > 0;
+                 if(!result) return Result<Unit>.Failure("Unable to edit Activity");
+                 return Result<Unit>.Success(Unit.Value);
              }
          }
     }

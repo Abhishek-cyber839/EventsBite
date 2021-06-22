@@ -6,10 +6,10 @@ export default function Home(){
         <Segment inverted textAlign='center' vertical className='masthead'>
             <Container text>
                 <h1 className='custom-font'>
-                Home Page
+                Events
                 </h1>
-                <Header as='h2' inverted className='custom-font' content='Welcome'/>
-                <Button as={Link} to={'/activities'} size='large' className='custom-font'>
+                <Header as='h2' inverted className='custom-font' content='See for more details'/>
+                <Button as={Link} to={'/activities'} size='large' basic inverted color='black' className='custom-font'>
                     Take Me To Activities
                 </Button>
             </Container>

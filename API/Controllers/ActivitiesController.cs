@@ -7,35 +7,45 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Application.Features;
 
+
+/** 
+IActionReult allows us to send http responses whereas ActionReult allows us to send actual objets for ex-activity.
+APIController attribute helps in generating 400 responses automatically.
+*/
 namespace API.Controllers
 {
     public class ActivitiesController: BaseApiController
     {
         
         [HttpGet]
-        public async Task<ActionResult<List<Activity>>> GetActivities(){
-            return await mediator.Send(new ListActivities.Query());
+        public async Task<IActionResult> GetActivities(){
+            return HandleResult(await mediator.Send(new ListActivities.Query()));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Activity>> GetActivity(Guid id){
-            return await mediator.Send(new GetActivity.Query{activity_id = id});;
+        public async Task<IActionResult> GetActivity(Guid id){
+            /** 
+            Without Result objects we could have simply returned the activity object like this 
+            return await mediator.Send(new GetActivity.Query{activity_id = id});
+            whereas Now - await mediator.Send(new GetActivity.Query{activity_id = id}); // returns a result object
+            */
+            return HandleResult(await mediator.Send(new GetActivity.Query{activity_id = id}));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateActivity(Activity activity){
-            return Ok(await mediator.Send(new CreateActivity.Command{new_activity = activity}));
+            return HandleResult(await mediator.Send(new CreateActivity.Command{new_activity = activity}));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> EditActivity(Guid id,Activity activity){
             activity.Id = id;
-            return Ok(await mediator.Send(new EditActivity.Command{new_activity = activity}));
+            return HandleResult(await mediator.Send(new EditActivity.Command{new_activity = activity}));
         }
 
          [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id){
-            return Ok(await mediator.Send(new DeleteActivity.Command{activity_id = id}));
+            return HandleResult(await mediator.Send(new DeleteActivity.Command{activity_id = id}));
         }
     }
 }

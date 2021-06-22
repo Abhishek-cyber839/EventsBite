@@ -1,5 +1,8 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { toast } from "react-toastify";
 import {Activity} from '../models/activity';
+import { store } from "./Stores/store";
+import { history } from '../../../src/index'
 
 axios.defaults.baseURL = "https://localhost:5001/api";
 
@@ -10,11 +13,53 @@ const delayLoading = (duration:number) => {
         setTimeout(resolve, duration);
     })
 }
+
+// axios.interceptors.response.use(async response => {
+//     return await delayLoading(1000).then(() => {return response}).catch((err)=> {
+//         console.log(`Erro occured in Line 14 Agent.ts:${err.message}`)
+//         return Promise.reject(err)
+//     })
+// }) ;
+
 axios.interceptors.response.use(async response => {
-    return await delayLoading(1000).then(() => {return response}).catch((err)=> {
-        console.log(`Erro occured in Line 14 Agent.ts:${err.message}`)
-        return Promise.reject(err)
-    })
+    await delayLoading(1000);
+    return response;
+},(error:AxiosError) => {
+    const {data,status,config} = error.response!;
+    switch(status){
+        case 400:
+            /** 
+             * data.errors object will contain all the validation errors thrown by FluentValidation
+             * For example-
+             * Fields must not be empty.
+             *
+             */
+            if(config.method === 'get' && data.errors.hasOwnProperty('id'))
+                history.push('/not-found')
+            if(data.errors){
+                const ModalErrors = [];
+                for(const key in data.errors){
+                    if(data.errors[key]){
+                        ModalErrors.push(data.errors[key]);
+                    }
+                }
+                throw ModalErrors.flat();
+            }
+            if(typeof data === 'string')
+                toast.error(data);        
+            break;
+        case 401:
+            toast.error("Unauthorized");
+            break;
+        case 404:
+            toast.error("Not Found");
+            break;   
+        case 500:
+            store.commonStore.setServerErrors(data);
+            history.push('/server-error');
+            break;
+    }
+    return Promise.reject(error);
 }) ;
 
 const responseData = (response:AxiosResponse) => response.data;
