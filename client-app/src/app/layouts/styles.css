@@ -49,3 +49,7 @@ body{
 .custom-font{
   font-family: 'Montserrat', sans-serif !important;
 }
+
+.react-datepicker-wrapper{
+  width: 100%;
+}

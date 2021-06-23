@@ -5,6 +5,7 @@ import { LoadingComponent } from '../../app/layouts/LoadingComponent';
 import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ActivityFilter } from "./ActivityFilter"; 
+import { format } from "date-fns";
 
 const Dashboard = () => {
     const { activityStore } = useStore();
@@ -32,7 +33,7 @@ const Dashboard = () => {
                                     src={'/assets/user.jpeg'}
                                     />
                                     <Card.Header className='custom-font'>{activity.title}</Card.Header>
-                                    <Card.Meta>{activity.date}</Card.Meta>
+                                    <Card.Meta>{format(activity.date!,'dd MMM yyyy h:mm aa')}</Card.Meta>
                                     <Card.Description>
                                     Posted By: <strong>Steve Bob</strong>
                                     </Card.Description>

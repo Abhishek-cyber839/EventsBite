@@ -1,6 +1,8 @@
 import { Image,Segment,Button,Header,Item } from "semantic-ui-react";
 import {Activity} from '../../../app/models/activity'
 import { observer } from 'mobx-react-lite'
+import {Link} from 'react-router-dom'
+import { format } from "date-fns";
 
 interface Props {
     activity: Activity
@@ -34,7 +36,7 @@ const ActivityHeader = ({activity}:Props) => {
                                     style={{color: 'white'}}
                                     className='custom-font'
                                 />
-                                <p>{activity.date}</p>
+                                <p>{format(activity.date!,'dd MMM yyyy h:mm aa')}</p>
                                 <p>
                                     Hosted by <strong>Bob</strong>
                                 </p>
@@ -46,7 +48,7 @@ const ActivityHeader = ({activity}:Props) => {
             <Segment clearing attached='bottom'>
                 <Button color='teal' className='custom-font'>Join Activity</Button>
                 <Button className='custom-font'>Cancel attendance</Button>
-                <Button color='orange' floated='right' className='custom-font'>
+                <Button as={Link} to={`/manage/${activity.id}`} color='orange' floated='right' className='custom-font'>
                     Manage Event
                 </Button>
             </Segment>
