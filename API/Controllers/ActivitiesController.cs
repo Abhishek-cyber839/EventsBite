@@ -1,6 +1,7 @@
 using Persistent;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Domain;
 using System.Collections.Generic;
 using System;
@@ -14,6 +15,7 @@ APIController attribute helps in generating 400 responses automatically.
 */
 namespace API.Controllers
 {
+    [AllowAnonymous]
     public class ActivitiesController: BaseApiController
     {
         
@@ -22,6 +24,7 @@ namespace API.Controllers
             return HandleResult(await mediator.Send(new ListActivities.Query()));
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id){
             /** 

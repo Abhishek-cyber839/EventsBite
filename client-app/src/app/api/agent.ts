@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import {Activity} from '../models/activity';
 import { store } from "./Stores/store";
 import { history } from '../../../src/index'
+import { UserForm } from '../models/user'
 
 axios.defaults.baseURL = "https://localhost:5001/api";
 
@@ -62,6 +63,13 @@ axios.interceptors.response.use(async response => {
     return Promise.reject(error);
 }) ;
 
+/** We will send token with each request if it is available inside the local storage */
+axios.interceptors.request.use(config => {
+    const token = store.commonStore.token;
+    if(token) config.headers.Authorization = `Bearer ${token}`
+    return config
+})
+
 const responseData = (response:AxiosResponse) => response.data;
 const requests = {
     get:(url:string) => axios.get(url).then(responseData),
@@ -80,8 +88,15 @@ const CrudOperations = {
     Delete:(id:string) => requests.del(`/activities/${id}`),
 }
 
+const Account = {
+    currentUser: () => requests.get('/account'),
+    loginUser: (user:UserForm) => requests.post('/account/login',user),
+    registerUser: (user:UserForm) => requests.post('/account/register',user)
+}
+
 const Agent = {
-    CrudOperations
+    CrudOperations,
+    Account
 }
 
 export default Agent;
