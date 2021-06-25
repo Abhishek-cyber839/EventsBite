@@ -1,8 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { Segment,List,Label,Image} from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { Activity } from '../../../app/models/activity';
 
-const ActivitySideBar = () => {
+interface Props{
+    activity:Activity
+}
+
+const ActivitySideBar = ({activity:{participants,host} }:Props) => {
+    if(!participants) return null
     return(
         <>
         <Segment
@@ -12,40 +18,32 @@ const ActivitySideBar = () => {
             secondary
             inverted
         >
-            16 People Going
+        { participants!.length === 1 ? 'Only One Person' : `${participants!.length} People` } Going 
         </Segment>
         <Segment attached inverted>
         <b style={{ marginTop:'50px' }}>See who's attending this event</b>
             <List relaxed divided animated verticalAlign='middle'>
-                <List.Item>
-                    <Label
-                        style={{ position: 'absolute' }}
-                        color='orange'
-                        ribbon='right'
-                    >
-                        Host
-                    </Label>
-                    <Image avatar src={'/assets/user.jpeg'} />
-                    <List.Content>
-                        <List.Header className='custom-font'><Link to={`#`}>Hopkins</Link></List.Header>
-                        Host
-                    </List.Content>
-                </List.Item>
-                <List.Item>
-                    <Image avatar src={'/assets/user.jpeg'} />
-                    <List.Content>
-                        <List.Header className='custom-font'><Link to={`#`}>Steve</Link></List.Header>
-                        Top User
-                    </List.Content>
-                </List.Item>
-
-                <List.Item>
-                    <Image avatar src={'/assets/user.jpeg'} />
-                    <List.Content>
-                        <List.Header className='custom-font'><Link to={`#`}>Sally</Link></List.Header>
-                        Top Contributor
-                    </List.Content>
-                </List.Item>
+                { 
+                participants!.map( participant => (
+                    <List.Item key={participant.userName}>
+                        {
+                           host?.userName === participant.userName &&
+                           <Label
+                           style={{ position: 'absolute' }}
+                           color='orange'
+                           ribbon='right'
+                           >
+                              Host
+                          </Label>
+                        }
+                        <Image avatar src={participant.image || '/assets/user.jpeg'} />
+                        <List.Content>
+                            <List.Header className='custom-font'><Link to={`/profiles/${participant.userName}`}>{participant.displayName}</Link></List.Header>
+                             { host?.userName !== participant.userName ? 'Participant' : 'Host' }
+                           </List.Content>
+                    </List.Item>
+                )) 
+                }
             </List>
         </Segment>
     </>

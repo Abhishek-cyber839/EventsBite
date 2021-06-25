@@ -13,7 +13,7 @@ const CTextArea = (props:Props) => {
     return (
         <Form.Field error={meta.touched && !!meta.error}>
             <label>{props.label}</label>
-            <textarea {...field} {...props}/>
+            <textarea className='custom-font' {...field} {...props}/>
             {meta.touched && meta.error ? <Label pointing>{meta.error}</Label> : null }
         </Form.Field>
     )

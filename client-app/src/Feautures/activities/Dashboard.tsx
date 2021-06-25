@@ -1,4 +1,4 @@
-import { Card,CardGroup,Button,Container,Grid,Image,Icon } from "semantic-ui-react";
+import { Card,CardGroup,Button,Container,Grid,Image,Icon,Item,Label } from "semantic-ui-react";
 import { useStore } from "../../app/api/Stores/store";
 import { observer } from "mobx-react-lite";
 import { LoadingComponent } from '../../app/layouts/LoadingComponent';
@@ -6,6 +6,7 @@ import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ActivityFilter } from "./ActivityFilter"; 
 import { format } from "date-fns";
+import ActivityListParticipants from "./ActivityListParticipants";
 
 const Dashboard = () => {
     const { activityStore } = useStore();
@@ -27,38 +28,87 @@ const Dashboard = () => {
                           { activities.map((activity:any) => (
                             <Card key={activity.id}>
                                 <Card.Content>
+                                {
+                                    activity.isCancelled &&
+                                    <Label
+                                    style={{ textAlign:'center',position: 'absolute'}}
+                                    attached='top left'
+                                    color='red'
+                                    >
+                                    Event Cancelled </Label>
+                                }    
                                 <Image
+                                    circular
                                     floated='right'
-                                    size='mini'
+                                    size='tiny'
                                     src={'/assets/user.jpeg'}
                                     />
                                     <Card.Header className='custom-font'>{activity.title}</Card.Header>
                                     <Card.Meta>{format(activity.date!,'dd MMM yyyy h:mm aa')}</Card.Meta>
                                     <Card.Description>
-                                    Posted By: <strong>Steve Bob</strong>
+                                    Posted By:  <strong>
+                                        <Link to={`/profiles/${activity.host?.userName}`}>{activity.host?.displayName}</Link>
+                                     </strong>
+                                    { 
+                                    activity.isHost && !activity.isCancelled &&
+                                      <Item.Description>
+                                           <Label
+                                                style={{ position: 'absolute' }}
+                                                color='orange'
+                                                ribbon='right'
+                                            >
+                                                You're hosting this event
+                                            </Label>
+                                      </Item.Description>
+                                      
+                                    }
+                                      { 
+                                    !activity.isHost && activity.isGoing &&
+                                      <Item.Description>
+                                           <Label
+                                                
+                                                style={{ textAlign:'center',position: 'absolute'}}
+                                                attached='top left'
+                                                color='green'
+                                            >
+                                                You're also attending this event
+                                            </Label>
+                                      </Item.Description>
+                                      
+                                    }
                                     </Card.Description>
-                                    <Card.Content extra><Icon name='user' />25 Attending</Card.Content>
-                                    <Card.Content extra><Icon name='tag' />75 available now</Card.Content>
+                                    <ActivityListParticipants  participants={activity.participants!}/>
+                                    <Card.Content extra><Icon name='user' />{ activity.participants.length } Attending</Card.Content>
+                                    <Card.Content extra><Icon name='tag' />{75 - activity.participants.length } still seats available now</Card.Content>
                                     {/* <Card.Description>
                                             {activity.description}
                                     </Card.Description> */}
                                 </Card.Content>
                                 <Card.Content extra>
-                                    <div className='ui two buttons'>
-                                        <Button as={Link} to={`/manage/${activity.id}`} basic color='green'>
-                                        Edit
-                                        </Button>
-                                        <Button onClick={() => activityStore.deleteActivity(activity.id)} basic color='red'>
-                                        Delete
-                                        </Button>
-                                    </div>
+                                    {
+                                        activity.isHost ? 
+                                        (
+                                            <> 
+                                              <div className='ui two buttons'>
+                                                <Button as={Link} to={`/manage/${activity.id}`} basic color='green'>
+                                                  Edit
+                                                </Button>
+                                                <Button onClick={() => activityStore.deleteActivity(activity.id)} basic color='red'>
+                                                  Delete
+                                                </Button>
+                                            </div>
+                                            </> 
+                                        ) : 
+                                        <> </>
+                                        
+                                    }
                                 <Container style={{ marginTop: 10}}>
                                     <Card.Meta>Category: {activity.category}</Card.Meta>
                                     <Card.Meta>Where: {activity.city}</Card.Meta>
                                     <Card.Meta>Veneue: {activity.venue}</Card.Meta>
                                     <Button as={Link} to={`/activities/${activity.id}`}
-                                              basic color='blue' style={{ marginTop: 12}}>
-                                        More Info
+                                              basic color={ activity.isHost ? 'blue' : 'brown'} style={{ marginTop: 12}}>
+                                       { activity.isHost ? 'More Info' : 'Book Now' } 
                                     </Button>
                                 </Container>
                                 </Card.Content>

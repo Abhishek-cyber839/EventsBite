@@ -12,7 +12,7 @@ import CTextArea from "../../app/common/form/CTextArea";
 import CSelectInput from "../../app/common/form/CSelectInput";
 import CDateInput from "../../app/common/form/CDateInput";
 import { CatergoryOptions } from "../../app/common/form/CategoryOptions";
-import { Activity } from "../../app/models/activity";
+import { ActivityForm } from "../../app/models/activity";
 
 const AForm = () => {
     const { activityStore } = useStore();
@@ -23,15 +23,7 @@ const AForm = () => {
     // add <Activity> to remove error from setActivity inside useEffect so that it'll know what type of object.
     // Install date-fns so that we can format dates to string as we are passing Date object to browser which it won't display unless it is
     // a string.
-    const [activity,setActivity] = useState<Activity>({
-        id:'',
-        title:'',
-        date:null,
-        description:'',
-        category:'',
-        city:'',
-        venue:''
-    });
+    const [activity,setActivity] = useState<ActivityForm>(new ActivityForm());
 
     const validationSchema = Yup.object({
         title: Yup.string().required('Title must not be empty'),
@@ -43,12 +35,12 @@ const AForm = () => {
     })
 
     useEffect(() => {
-        if(id) LoadActivity(id).then((activity) => setActivity(activity!))
+        if(id) LoadActivity(id).then((activity) => setActivity(new ActivityForm(activity!)))
     },[id,LoadActivity])
 
 
-    const handleSubmit = (activity:Activity) => {
-        if(activity.id.length === 0){
+    const handleSubmit = (activity:ActivityForm) => {
+        if(!activity.id){
             let newActivity = {
                 ...activity,id:uuid()
             }
@@ -75,7 +67,7 @@ const AForm = () => {
                 validationSchema={validationSchema}
                 enableReinitialize 
                 initialValues={activity} 
-                onSubmit={(values) =>handleSubmit(values)}>
+                onSubmit={(values) => handleSubmit(values)}>
                     {({handleSubmit, isValid,isSubmitting,dirty}) => (
                         <Form className='ui form custom-font' onSubmit={handleSubmit}>
                             <Header size='small' className='custom-font'>ACTIVITY DETAILS</Header>
@@ -93,7 +85,7 @@ const AForm = () => {
                             <CTextInput placeholder='City' name='city'/>
                             <CTextInput placeholder='Venue' name='venue'/>
                             <Button disabled={isSubmitting || !dirty || !isValid}
-                            className='custom-font' loading={activityStore.Loading} floated='right' positive type='submit'>Submit</Button>
+                            className='custom-font' loading={isSubmitting} floated='right' positive type='submit'>Submit</Button>
                             <Button as={Link} className='custom-font' to={'/activities/'} floated='right' type='button'>Cancel</Button>
                     </Form>
                     )}

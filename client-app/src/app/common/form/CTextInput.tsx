@@ -13,7 +13,7 @@ const CTextInput = (props:Props) => {
     return (
         <Form.Field error={meta.touched && !!meta.error}>
             <label>{props.label}</label>
-            <input {...field} {...props}/>
+            <input className='custom-font' {...field} {...props}/>
             {meta.touched && meta.error ? <Label pointing>{meta.error}</Label> : null }
         </Form.Field>
     )

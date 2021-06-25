@@ -28,7 +28,7 @@ const Details = () => {
                <ActivityChat/>
             </Grid.Column>
             <Grid.Column width='6'>
-               <ActivitySideBar/>
+               <ActivitySideBar activity={activityStore.currentActivity!}/>
             </Grid.Column>
         </Grid>
     )

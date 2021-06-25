@@ -1,7 +1,9 @@
 import { format } from "date-fns";
 import {  makeAutoObservable, runInAction } from "mobx";
-import { Activity } from "../../models/activity";
+import { Activity, ActivityForm } from "../../models/activity";
+import { Profile } from "../../models/ActivityParticipant";
 import Agent from '../agent';
+import { store } from "./store";
 
 export default class ActivityStore {
 
@@ -31,40 +33,36 @@ export default class ActivityStore {
 
     setInitialLoading = (state:boolean) => this.InitialLoading = state 
 
-    createActivity = async (activity:Activity) => {
-        this.Loading = true
+    createActivity = async (activity:ActivityForm) => {
+        const user  = store.userStore.user;
+        const participant = new Profile(user!);
         try {
             await Agent.CrudOperations.Create(activity)
-            runInAction(() => {
-                this.activityRegistry.set(activity.id,activity);
-                this.Loading = false
-                this.editing = false
-                this.currentActivity = activity
-            })
+            const newActivity = new Activity(activity)
+            newActivity.hostUserName = user!.userName;
+            newActivity.participants = [participant]
+            this.SetActivity(newActivity)
+            runInAction(() => this.currentActivity = newActivity )
         } catch (error) {
             console.log("Error deleteActivity():ActivityStore.ts\n")
-            runInAction(() => {
-                this.Loading = false
-            })
         }
     }
 
 
-    updateActivity = async (activity:Activity) => {
-        this.Loading = true
+    updateActivity = async (activity:ActivityForm) => {
         try {
-            await Agent.CrudOperations.Update(activity.id,activity)
+            if(activity.id){
+                await Agent.CrudOperations.Update(activity.id,activity)
+            }
             runInAction(() => {
-                this.activityRegistry.set(activity.id,activity)
-                this.currentActivity = activity
-                this.editing = false
-                this.Loading = false
+                if(activity.id){
+                    let updatedActivity = {...this.GetActivity(activity.id),...activity}
+                    this.activityRegistry.set(activity.id,updatedActivity as Activity)
+                    this.currentActivity = updatedActivity as Activity
+                }
             })
         } catch (error) {
             console.log("Error UpdateActivity():ActivityStore.ts\n")
-            runInAction(() => {
-                this.Loading = false;
-            })
         }
     }
 
@@ -112,6 +110,15 @@ export default class ActivityStore {
     }
 
     private  SetActivity = (activity:Activity) => {
+        const user = store.userStore.user;
+        // activity.participants!.some will return boolean if any item inside matches the condition inside it.
+        if(user){
+            activity.isGoing = activity.participants!.some(
+                  participant => participant.userName === user.userName
+                );
+            activity.isHost = activity.hostUserName === user.userName;
+            activity.host = activity.participants?.find(participant => participant.userName === activity.hostUserName)
+        }
         activity.date = new Date(activity.date!)
         this.activityRegistry.set(activity.id,activity)
     }
@@ -128,5 +135,50 @@ export default class ActivityStore {
                 return activities
             },{} as {[key:string] : Activity[]})
         )
+    }
+
+    updateAttendance = async () => {
+        const user = store.userStore.user;
+        this.Loading = true;
+        try {
+            await Agent.CrudOperations.Attend(this.currentActivity!.id);
+            runInAction(() => {
+                // User is going and want to cancel
+                if(this.currentActivity?.isGoing){
+                    // if going remove user from list of participants
+                    this.currentActivity.participants = this.currentActivity.participants?.filter(participant => participant.userName !== user?.userName)
+                    this.currentActivity.isGoing = false
+                } 
+                // User is not going and want to participate
+                else{
+                    const participant = new Profile(user!)
+                    this.currentActivity?.participants?.push(participant)
+                    this.currentActivity!.isGoing = true
+                }
+                // add update activity
+                this.activityRegistry.set(this.currentActivity!.id,this.currentActivity!)
+            })
+        } catch (error) {
+            console.log("Error Updating Attendance:updateAttendance()\n",error.message)
+        }
+        finally{
+            runInAction(() => this.Loading = false)
+        }
+    }
+
+    cancelActivity = async () => {
+        this.Loading = true
+        try {
+            await Agent.CrudOperations.Attend(this.currentActivity!.id);
+            runInAction(() => { 
+                this.currentActivity!.isCancelled = !this.currentActivity?.isCancelled
+                this.activityRegistry.set(this.currentActivity!.id,this.currentActivity!)
+            })
+        }catch (error) {
+            console.log("Error Cancelling Activity:cancelAttendance()\n",error.message)
+        }
+        finally{
+            runInAction(() => this.Loading = false)
+        }
     }
 }

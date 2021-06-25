@@ -1,14 +1,16 @@
-import { Image,Segment,Button,Header,Item } from "semantic-ui-react";
+import { Image,Segment,Button,Header,Item,Label } from "semantic-ui-react";
 import {Activity} from '../../../app/models/activity'
 import { observer } from 'mobx-react-lite'
 import {Link} from 'react-router-dom'
 import { format } from "date-fns";
+import { useStore } from "../../../app/api/Stores/store";
 
 interface Props {
     activity: Activity
 }
 
 const ActivityHeader = ({activity}:Props) => {
+    const { activityStore } = useStore();
     const activityImageStyle = {
         filter: 'brightness(30%)'
     };
@@ -25,6 +27,15 @@ const ActivityHeader = ({activity}:Props) => {
     return(
          <Segment.Group>
             <Segment basic attached='top' style={{padding: '0'}}>
+                {
+                    activity.isCancelled &&
+                    <Label
+                       style={{ position: 'absolute',zIndex:1000,left:80,top:20 }}
+                       color='red'
+                       ribbon='right'
+                       >
+                     Cancelled </Label>
+                }
                 <Image src={'/assets/Activity.png'} fluid style={activityImageStyle}/>
                 <Segment style={activityImageTextStyle} basic>
                     <Item.Group>
@@ -46,11 +57,27 @@ const ActivityHeader = ({activity}:Props) => {
                 </Segment>
             </Segment>
             <Segment clearing attached='bottom'>
-                <Button color='teal' className='custom-font'>Join Activity</Button>
-                <Button className='custom-font'>Cancel attendance</Button>
-                <Button as={Link} to={`/manage/${activity.id}`} color='orange' floated='right' className='custom-font'>
-                    Manage Event
-                </Button>
+                {
+
+                    activity.isHost ? 
+                    (
+                      <> 
+                        <Button 
+                            basic onClick={activityStore.cancelActivity} loading={activityStore.Loading}
+                            color= { activity.isCancelled ? 'brown' : 'green'} floated='left' className='custom-font'>
+                            { activity.isCancelled ? 'Re-Activate-Event' : 'Cancel Event'}
+                        </Button>
+                        <Button disabled={activity.isCancelled} as={Link} to={`/manage/${activity.id}`} color='orange' floated='right' className='custom-font'>
+                            Manage Event
+                       </Button>
+                      </>
+                    ) : activity.isGoing ? 
+                    ( <Button 
+                        loading={activityStore.Loading}
+                        onClick={activityStore.updateAttendance} className='custom-font'>Cancel attendance</Button> ) 
+                    :  <Button disabled={activity.isCancelled} 
+                       loading={activityStore.Loading} onClick={activityStore.updateAttendance} color='teal' className='custom-font'>Join Activity</Button>
+                }
             </Segment>
         </Segment.Group>
 
