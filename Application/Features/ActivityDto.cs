@@ -1,10 +1,10 @@
 using System;
-using Domain;
 using System.Collections.Generic;
+using Application.Profiles;
 
-namespace Domain
+namespace Application.Features
 {
-    public class Activity
+    public class ActivityDto
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
@@ -13,8 +13,8 @@ namespace Domain
         public string City { get; set; }
         public string Venue { get; set; }
         public DateTime Date { get; set; }
-        /* Add new List<ActivityPaticipants>(); so that we won't get null reference in response.*/
-        public ICollection<ActivityPaticipants> Participants { get; set; } = new List<ActivityPaticipants>();
+        public ICollection<Profile> Participants { get; set; }
+        public string HostUserName { get; set; }
         public bool IsCancelled {get; set;}
     }
 }

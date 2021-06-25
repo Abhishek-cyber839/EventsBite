@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Identity;
+using Domain;
+using System.Collections.Generic;
 
 namespace Domain
 {
@@ -6,5 +8,6 @@ namespace Domain
     {
         public string DisplayName{get; set;}
         public string Bio{get; set;}
+        public ICollection<ActivityPaticipants> Activities { get; set; }
     }
 }

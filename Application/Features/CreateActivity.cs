@@ -8,6 +8,7 @@ using System.Threading;
 using System;
 using FluentValidation;
 using Application.Core;
+using Application.Interfaces;
 
 namespace Application.Features
 {
@@ -24,10 +25,20 @@ namespace Application.Features
         }
          public class Handler: IRequestHandler<Command,Result<Unit>>{
              private readonly DataContext _context;
-             public Handler(DataContext dataContext){
+             private readonly IUserAccessor _userAccessor;
+             public Handler(DataContext dataContext,IUserAccessor userAccessor){
                  _context = dataContext;
+                 _userAccessor = userAccessor;
              }
              public async Task<Result<Unit>> Handle(Command request,CancellationToken cancellationToken){
+                 /* we can use _context or usermanager to get users from Users table. */ 
+                 var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
+                 var participant = new ActivityPaticipants{
+                     User = user,
+                     Activity = request.new_activity,
+                     IsHost = true
+                 };
+                 request.new_activity.Participants.Add(participant);
                  _context.Activities.Add(request.new_activity);
                  /** When Database performs Change Operation and Saves Changes successfully it returns an integer greater than 0. **/
                  var result = await _context.SaveChangesAsync() > 0;
