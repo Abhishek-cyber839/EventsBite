@@ -27,6 +27,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Application.Interfaces;
+using Infrastructure.Security;
 
 namespace API
 {
@@ -84,6 +86,14 @@ namespace API
                 };
             });
             services.AddScoped<TokenService>();
+            services.AddScoped<IUserAccessor,UserAccessor>();
+            services.AddAuthorization(opt => {
+                opt.AddPolicy("IsActivityHost",policy => {
+                    policy.Requirements.Add(new IsHostRequirement());
+                });
+            }); // For edit and delete operations on an activity.Check IsHostRequirement.cs for morw info.
+            services.AddTransient<IAuthorizationHandler,IsHostRequirementHandler>(); 
+            // Transient will dispose IAuthorizationHandler,IsHostRequirementHandler from memory once a user is authorized.
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

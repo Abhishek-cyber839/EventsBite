@@ -15,7 +15,6 @@ APIController attribute helps in generating 400 responses automatically.
 */
 namespace API.Controllers
 {
-    [AllowAnonymous]
     public class ActivitiesController: BaseApiController
     {
         
@@ -24,7 +23,6 @@ namespace API.Controllers
             return HandleResult(await mediator.Send(new ListActivities.Query()));
         }
 
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id){
             /** 
@@ -41,14 +39,34 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy="IsActivityHost")]
+        /** 
+         Authorize("IsActivityHost") will allow only authorized users to edit this activity.Authorization is implemented inside 
+         Infrastructure > Security > IHostRequirement.
+         Steps Followed:
+         1.Implement a policy that we want to use
+         2.Add that inside start class using services.
+         3.Give your policy a custom name.In this case I've choosen IsActivityHost so that we can reference that policy on the routes 
+         using Authorize attribute from Microsoft.AspNetCore.Authorization.
+         Same steps are followed for any other policy whether it's an Authentication or any other user defined policy that we want to 
+         use.
+        */
         public async Task<IActionResult> EditActivity(Guid id,Activity activity){
             activity.Id = id;
             return HandleResult(await mediator.Send(new EditActivity.Command{new_activity = activity}));
         }
 
-         [HttpDelete("{id}")]
+        [HttpDelete("{id}")]
+        [Authorize(Policy="IsActivityHost")]
         public async Task<IActionResult> DeleteActivity(Guid id){
             return HandleResult(await mediator.Send(new DeleteActivity.Command{activity_id = id}));
         }
+
+        [HttpPost("{id}/attend")]
+        public async Task<IActionResult> AttendActivity(Guid id){
+            return HandleResult(await mediator.Send(new UpdateAttendance.Command{Id = id}));
+        }
+
+
     }
 }
