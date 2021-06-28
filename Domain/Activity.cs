@@ -16,5 +16,6 @@ namespace Domain
         /* Add new List<ActivityPaticipants>(); so that we won't get null reference in response.*/
         public ICollection<ActivityPaticipants> Participants { get; set; } = new List<ActivityPaticipants>();
         public bool IsCancelled {get; set;}
+        public ICollection<Comment> Comments{ get; set; } = new List<Comment>();
     }
 }

@@ -13,7 +13,7 @@ namespace Application.Features
         public string City { get; set; }
         public string Venue { get; set; }
         public DateTime Date { get; set; }
-        public ICollection<Profile> Participants { get; set; }
+        public ICollection<ParticipantDto> participants { get; set; }
         public string HostUserName { get; set; }
         public bool IsCancelled {get; set;}
     }

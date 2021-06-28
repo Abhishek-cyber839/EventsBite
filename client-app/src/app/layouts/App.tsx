@@ -14,6 +14,7 @@ import LoginForm from '../../Feautures/users/LoginForm';
 import { useStore } from '../api/Stores/store';
 import { LoadingComponent } from './LoadingComponent';
 import ModalContainer from '../common/ModalContainer';
+import Profile from '../../Feautures/Profiles/Profile';
 
 const App = () => {
   const location  = useLocation();
@@ -41,6 +42,7 @@ const App = () => {
                   <Route path="/not-found-error"component={NotFound}/>
                   <Route path="/server-error" component={ServerError}/>
                   <Route path="/login" component={LoginForm}/>
+                  <Route path="/profiles/:username" component={Profile}/>
                 </Switch>
               </Container>
            </>

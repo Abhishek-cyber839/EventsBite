@@ -96,10 +96,26 @@ const Account = {
 }
 
 
+const Profiles = {
+    getProfile:(username:string) => requests.get(`/profile/${username}`),
+    uploadPhoto:(file:Blob) => {
+        let formData = new FormData();
+        formData.append('File',file)
+        return axios.post('photos',formData,{
+            headers:{'Content-type':'multipart/form-data'}
+          }
+        )
+    },
+    setMainPhoto:(id:string) => requests.post(`/photos/${id}/setmain`,{}),
+    deletePhoto:(id:string) => requests.del(`/photos/${id}`)
+
+}
+
 
 const Agent = {
     CrudOperations,
-    Account
+    Account,
+    Profiles
 }
 
 export default Agent;

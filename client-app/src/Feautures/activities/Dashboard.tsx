@@ -41,7 +41,7 @@ const Dashboard = () => {
                                     circular
                                     floated='right'
                                     size='tiny'
-                                    src={'/assets/user.jpeg'}
+                                    src={activity.host?.Image || '/assets/user.jpeg'}
                                     />
                                     <Card.Header className='custom-font'>{activity.title}</Card.Header>
                                     <Card.Meta>{format(activity.date!,'dd MMM yyyy h:mm aa')}</Card.Meta>
@@ -90,11 +90,11 @@ const Dashboard = () => {
                                         (
                                             <> 
                                               <div className='ui two buttons'>
-                                                <Button as={Link} to={`/manage/${activity.id}`} basic color='green'>
-                                                  Edit
+                                                <Button as={Link} to={`/activities/${activity.id}`} basic color='green' style={{ marginRight:5 }}>
+                                                  Format
                                                 </Button>
                                                 <Button onClick={() => activityStore.deleteActivity(activity.id)} basic color='red'>
-                                                  Delete
+                                                  Remove
                                                 </Button>
                                             </div>
                                             </> 
@@ -106,10 +106,12 @@ const Dashboard = () => {
                                     <Card.Meta>Category: {activity.category}</Card.Meta>
                                     <Card.Meta>Where: {activity.city}</Card.Meta>
                                     <Card.Meta>Veneue: {activity.venue}</Card.Meta>
-                                    <Button as={Link} to={`/activities/${activity.id}`}
-                                              basic color={ activity.isHost ? 'blue' : 'brown'} style={{ marginTop: 12}}>
-                                       { activity.isHost ? 'More Info' : 'Book Now' } 
-                                    </Button>
+                                    { !activity.isHost && 
+                                      <Button as={Link} to={`/activities/${activity.id}`}
+                                      basic color={ activity.isHost ? 'blue' : 'brown'} style={{ marginTop: 12}}>
+                                        { activity.isGoing ?  'Manage Booking'  : 'Book Now' } 
+                                       </Button>
+                                    }
                                 </Container>
                                 </Card.Content>
                             </Card>

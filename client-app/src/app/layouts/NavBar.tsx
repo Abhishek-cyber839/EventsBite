@@ -24,7 +24,7 @@ const NavBar = () => {
                       text={user?.displayName}
                    >
                        <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to={`/profile/${user?.userName}`} text='Profile' icon='user'/>
+                        <Dropdown.Item as={Link} to={`/profiles/${user?.userName}`} text='Profile' icon='user'/>
                         <Dropdown.Item onClick={LogOut} text='Log Out' icon='power'/>
                        </Dropdown.Menu>
                    </Dropdown>

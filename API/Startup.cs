@@ -29,6 +29,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Application.Interfaces;
 using Infrastructure.Security;
+using Infrastructure.Photos;
+using Microsoft.AspNetCore.SignalR;
+using API.SignalR;
 
 namespace API
 {
@@ -84,6 +87,25 @@ namespace API
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
+                /** 
+                Add authentication for SignalR.
+                1.Get JWT token from request params with name of "access_token" it needs to match the request param.
+                2.Get path from request.
+                3.Check if token is present and the reqeuest is comming from /chat i.e for SignalR connection.
+                4.Set context.Token = accessToken so that we can access it inside ChatHub.cs using context which will
+                give us access to user object.
+                */
+                opt.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context => {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if(!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
+                            context.Token = accessToken;
+                        return Task.CompletedTask;
+                    }
+
+                };
             });
             services.AddScoped<TokenService>();
             services.AddScoped<IUserAccessor,UserAccessor>();
@@ -94,6 +116,9 @@ namespace API
             }); // For edit and delete operations on an activity.Check IsHostRequirement.cs for morw info.
             services.AddTransient<IAuthorizationHandler,IsHostRequirementHandler>(); 
             // Transient will dispose IAuthorizationHandler,IsHostRequirementHandler from memory once a user is authorized.
+            services.Configure<CloudinaryServices>(_config.GetSection("Cloudinary"));
+            services.AddScoped<IPhotoAccessor,PhotoAccessor>();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -120,6 +145,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat"); // requests coming to /chat will be handled by ChatHub.cs
             });
         }
     }

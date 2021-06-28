@@ -7,6 +7,7 @@ using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore; // to use async version of method calls
 using System.Security.Claims;
+using System.Linq;
 
 namespace API.Controllers
 {
@@ -28,7 +29,9 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<Userdto>> LogIn(Logindto logindto){
             // Get user object from databse using _userManager
-            var user = await _userManager.FindByEmailAsync(logindto.Email);
+            // FindByEmailAsync(logindto.Email) doesn't do Eagerly Loading for user images.
+            var user = await _userManager.Users
+            .Include(user => user.Photos).FirstOrDefaultAsync(user => user.Email == logindto.Email);
             if(user == null)
                 return Unauthorized();
             // Then SignIn that user using _signInManager.
@@ -64,14 +67,15 @@ namespace API.Controllers
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<Userdto>> GetCurrentUser(){
-            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+            var user = await _userManager.Users.Include(user => user.Photos)
+                                         .FirstOrDefaultAsync(user => user.Email == User.FindFirstValue(ClaimTypes.Email));
             return CreateUserDTO(user);
         }
 
         private Userdto CreateUserDTO(User user){
             return new Userdto{
                     DisplayName = user.DisplayName,
-                    Image = null,
+                    Image = user?.Photos?.FirstOrDefault(photo => photo.IsMainPhoto)?.Url,
                     Token = _tokenService.CreateToken(user),
                     UserName = user.UserName
                 };
