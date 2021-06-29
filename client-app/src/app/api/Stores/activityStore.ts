@@ -181,4 +181,12 @@ export default class ActivityStore {
             runInAction(() => this.Loading = false)
         }
     }
+
+    /**
+     * Clear current activity from memory otherwise it'll give us an error when we go to activtiy details page
+     * and then come back and select different activity when making connection with signalR-hub as old activity is still 
+     * set as current activity so signalR will try to add that user to the same activity group again as per the logic 
+     * defined in ChatHub.cs which in return will throw an error.
+     */
+    clearCurrentActivity = () => this.currentActivity = undefined
 }

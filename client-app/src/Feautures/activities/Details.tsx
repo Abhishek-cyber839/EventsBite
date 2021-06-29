@@ -11,12 +11,13 @@ import { Grid } from "semantic-ui-react";
 
 const Details = () => {
     const { activityStore } = useStore();
-    const { LoadActivity,InitialLoading,currentActivity }  = activityStore
+    const { LoadActivity,InitialLoading,currentActivity,clearCurrentActivity }  = activityStore
     let { id } = useParams<{id:string}>();
 
     useEffect(() => {
         if(id) LoadActivity(id)
-    },[id,LoadActivity])
+        return () => clearCurrentActivity();
+    },[id,LoadActivity,clearCurrentActivity])
 
     if(InitialLoading || !currentActivity) return (<LoadingComponent content='Loading Details....'/>)
 
@@ -25,7 +26,7 @@ const Details = () => {
             <Grid.Column width='10'>
                <ActivityHeader activity={activityStore.currentActivity!}/>
                <ActivityDescription/>
-               <ActivityChat/>
+               <ActivityChat activityId={activityStore.currentActivity!.id}/>
             </Grid.Column>
             <Grid.Column width='6'>
                <ActivitySideBar activity={activityStore.currentActivity!}/>
