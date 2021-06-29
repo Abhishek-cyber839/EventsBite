@@ -26,7 +26,7 @@ namespace Application.Comments
             
              private readonly DataContext _context;
              private readonly IMapper _mapper;
-             public Handler(DataContext dataContext,IUserAccessor userAccessor,IMapper mapper){
+             public Handler(DataContext dataContext,IMapper mapper){
                  _context = dataContext;
                  _mapper = mapper;
              }

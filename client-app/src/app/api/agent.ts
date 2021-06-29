@@ -107,8 +107,9 @@ const Profiles = {
         )
     },
     setMainPhoto:(id:string) => requests.post(`/photos/${id}/setmain`,{}),
-    deletePhoto:(id:string) => requests.del(`/photos/${id}`)
-
+    deletePhoto:(id:string) => requests.del(`/photos/${id}`),
+    updateFollowings:(username:string) => requests.post(`/follow/${username}`,{}),
+    getFollowingsList:(username:string,predicate:string) => requests.get(`/follow/${username}?predicate=${predicate}`)
 }
 
 

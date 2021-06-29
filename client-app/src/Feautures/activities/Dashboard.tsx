@@ -77,7 +77,7 @@ const Dashboard = () => {
                                       
                                     }
                                     </Card.Description>
-                                    <ActivityListParticipants  participants={activity.participants!}/>
+                                    <ActivityListParticipants user={activity.host.userName} participants={activity.participants!}/>
                                     <Card.Content extra><Icon name='user' />{ activity.participants.length } Attending</Card.Content>
                                     <Card.Content extra><Icon name='tag' />{75 - activity.participants.length } still seats available now</Card.Content>
                                     {/* <Card.Description>

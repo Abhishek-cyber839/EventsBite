@@ -189,4 +189,15 @@ export default class ActivityStore {
      * defined in ChatHub.cs which in return will throw an error.
      */
     clearCurrentActivity = () => this.currentActivity = undefined
+
+    updateParticipantFollowing = (username:string) => {
+        this.activityRegistry.forEach((activity) => {
+            activity.participants?.forEach(participant => {
+                if(participant.userName === username){
+                    participant.following ? participant.followersCount-- : participant.followersCount++;
+                    participant.following = !participant.following
+                }
+            })
+        })
+    } 
 }

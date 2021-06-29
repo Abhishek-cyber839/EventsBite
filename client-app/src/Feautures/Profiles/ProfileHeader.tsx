@@ -2,11 +2,17 @@ import { Grid,List, Item, ItemGroup,Header,Card,Button,Image,Feed,Icon } from "s
 import { Profile } from "../../app/models/ActivityParticipant";
 import ProfileContent from "./ProfileContent";
 import {observer} from 'mobx-react-lite';
+import { store, useStore } from "../../app/api/Stores/store";
 
 interface Props{
     profile:Profile
 }
 const ProfileHeader = ({profile}:Props) => {
+    const user = store.userStore.user;
+    const { profileStore } = useStore();
+    const toggleFollow = () => {
+        profile.following ? profileStore.updateFollowing(profile.userName,false) : profileStore.updateFollowing(profile.userName,true)
+    }
     const BackgroundStyle = {
         position: 'absolute',
         top: '5%',
@@ -40,15 +46,28 @@ const ProfileHeader = ({profile}:Props) => {
                                 <p style={whiteText}><Icon name='clipboard' />20 Events</p>
                                 <List horizontal>
                                     <List.Item>
-                                       <p style={whiteText}><Icon name='handshake' /> 500 Friends</p>
+                                       <p style={whiteText}><Icon name='user' />{profile.followersCount > 1 ? profile.followersCount+
+                                       ' Followers' : profile.followersCount + ' Follower'}</p>
                                     </List.Item>
                                     <List.Item>
-                                       <p style={whiteText}><Icon name='user' /> 200 Following</p>
+                                       <p style={whiteText}><Icon name='user' />{profile.followingCount > 1 ? profile.followingCount+ 
+                                       ' Followings' : profile.followingCount + ' Following'}</p>
                                     </List.Item>
                                     <List.Item>
                                        <p style={whiteText}><Icon name='user circle' /> 300 Suggestions</p>
                                     </List.Item>
                                 </List>
+                                {
+                                    profile.userName !== user?.userName && 
+                                    <Button 
+                                    onClick={() => toggleFollow()}
+                                    fluid
+                                    color='blue'
+                                    content= { profile.following ? 'Un Follow' : 'Follow'}
+                                    className='custom-font'
+                                    style={{backgroundColor:'none',paddingLeft:15,paddingRight:15,width:'50%'}}
+                                   />
+                                }
                             </Item.Content>
                         </Item>
                     </ItemGroup>

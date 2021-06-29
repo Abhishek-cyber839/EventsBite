@@ -5,15 +5,18 @@ import {Link} from 'react-router-dom'
 // import UProfile from "../Profiles/UProfile";
 
 interface Props{
-    participants:Profile[]
+    participants:Profile[],
+    user:string
 }
-const ActivityPartcipants = ({participants}:Props) => {
+const ActivityPartcipants = ({participants,user}:Props) => {
     return(
         <List horizontal>
             {
             participants.map(participant => (
                 <Popup
-                  content={`${participant.userName} has been a member since July 2021`}
+                  content={participant.following ? 
+                    "You're already following "+participant.userName: participant.userName === user ? "See who's your followers":
+                    "Follow "+participant.userName + " for more details" } 
                   header={participant.userName}
                   key={participant.userName}
                   size='tiny'

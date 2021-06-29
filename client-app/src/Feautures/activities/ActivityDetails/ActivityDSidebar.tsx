@@ -39,7 +39,8 @@ const ActivitySideBar = ({activity:{participants,host} }:Props) => {
                         <Image avatar src={participant.image || '/assets/user.jpeg'} />
                         <List.Content>
                             <List.Header className='custom-font'><Link to={`/profiles/${participant.userName}`}>{participant.displayName}</Link></List.Header>
-                             { host?.userName !== participant.userName ? 'Participant' : 'Host' }
+                             { host?.userName !== participant.userName ? 'Participant ' : 'Host ' }
+                             { participant.following && <Label color='blue'>Following</Label>}
                            </List.Content>
                     </List.Item>
                 )) 
