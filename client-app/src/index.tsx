@@ -10,6 +10,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { store,StoreContext } from './app/api/Stores/store';
 import {Router} from 'react-router-dom';
 import { createBrowserHistory } from 'history';
+import ScrollToTop from './app/layouts/ScrollToTop';
 
 export const history = createBrowserHistory();
 /** 
@@ -24,6 +25,7 @@ export const history = createBrowserHistory();
 ReactDOM.render(
   <StoreContext.Provider value={store}>
     <Router history={history}>
+      <ScrollToTop/>
       <App />
     </Router>
   </StoreContext.Provider>

@@ -59,7 +59,7 @@ const ProfilePhotos = ({profile}:Props) => {
              IsCurrentUser && 
              <Button
               basic color='blue' onClick={() => setaddPhotoMode(!addPhotoMode)}
-              fluid style={{ marginTop:10 }}>{addPhotoMode ? 'Cancel' : 'Upload New Photo' }</Button>
+              fluid style={{ marginTop:20 }}>{addPhotoMode ? 'Cancel' : 'Upload New Photo' }</Button>
 
          }
         </>

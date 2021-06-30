@@ -49,7 +49,7 @@ const ActivityHeader = ({activity}:Props) => {
                                 />
                                 <p>{format(activity.date!,'dd MMM yyyy h:mm aa')}</p>
                                 <p>
-                                    Hosted by <strong>Bob</strong>
+                                    Hosted by <strong>{activity.hostUserName}</strong>
                                 </p>
                             </Item.Content>
                         </Item>

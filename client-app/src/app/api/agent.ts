@@ -7,8 +7,7 @@ import { UserForm } from '../models/user'
 import { PaginatedResult } from "../models/paginations";
 
 
-axios.defaults.baseURL = "https://localhost:5001/api";
-
+axios.defaults.baseURL = "https://localhost:5001/api" // process.env.REACT_APP_API_URL;
 
 /** Add delayLoading to axios.intereceptors to delay loading of activities */
 const delayLoading = (duration:number) => {
@@ -25,7 +24,8 @@ const delayLoading = (duration:number) => {
 // }) ;
 
 axios.interceptors.response.use(async response => {
-    await delayLoading(1000);
+    if(process.env.NODE_ENV === 'development')
+       await delayLoading(1000);
     const pagination = response.headers['pagination']
     if(pagination){
         console.log("Found pagination")

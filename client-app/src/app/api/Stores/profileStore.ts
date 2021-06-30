@@ -12,6 +12,7 @@ export class ProfileStore{
     LoadingFollowings:boolean = false;
     ActiveTab:number = 0
     userActivities:UserActivity[] = []
+    predicate:string | null = null;
 
     constructor(){ 
         makeAutoObservable(this) 
@@ -148,13 +149,13 @@ export class ProfileStore{
             runInAction(() => this.LoadingFollowings = false)
         }
     }
+    
+    setPredicate = (value:string) => this.predicate = value; 
 
-
-    LoadProfileActivities = async (username:string,predicate?:string) => {
+    LoadProfileActivities = async (username:string) => {
         try {
-            const activities:UserActivity[] = await Agent.Profiles.profileActivities(username,predicate!);
-            console.log(predicate! + " = \n" + activities)
-            runInAction(() => this.userActivities = activities as UserActivity[])
+            const activities = await Agent.Profiles.profileActivities(username,this.predicate!);
+            runInAction(() => this.userActivities = activities )
         } catch (error) {
             console.log("Error Getting profile activities:LoadProfileActivities()\n",error.messgae)
         }
