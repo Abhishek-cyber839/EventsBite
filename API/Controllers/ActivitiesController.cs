@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System;
 using Microsoft.EntityFrameworkCore;
 using Application.Features;
+using Application.Core;
 
 
 /** 
@@ -19,8 +20,8 @@ namespace API.Controllers
     {
         
         [HttpGet]
-        public async Task<IActionResult> GetActivities(){
-            return HandleResult(await mediator.Send(new ListActivities.Query()));
+        public async Task<IActionResult> GetActivities([FromQuery]ActivityParams pagingParams){
+            return HandlePagedResult(await mediator.Send(new ListActivities.Query{Params = pagingParams}));
         }
 
         [HttpGet("{id}")]

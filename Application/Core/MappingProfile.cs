@@ -44,6 +44,15 @@ namespace Application.Core
             .ForMember(destinationMember => destinationMember.UserName,options => options.MapFrom(source => source.Author.UserName))
             .ForMember(destinationMember => destinationMember.Image,
                        options => options.MapFrom(source => source.Author.Photos.FirstOrDefault(photo => photo.IsMainPhoto).Url));
+
+
+            CreateMap<ActivityPaticipants,Profiles.UserActivityDto>()
+            .ForMember(destinationMember => destinationMember.Id,options => options.MapFrom(source => source.Activity.Id))
+            .ForMember(destinationMember => destinationMember.Date,options => options.MapFrom(source => source.Activity.Date))
+            .ForMember(destinationMember => destinationMember.Title,options => options.MapFrom(source => source.Activity.Title))
+            .ForMember(destinationMember => destinationMember.Category,options => options.MapFrom(source => source.Activity.Category))
+            .ForMember(destinationMember => destinationMember.HostUserName,options => options.MapFrom(
+                source => source.Activity.Participants.FirstOrDefault(participant => participant.IsHost).User.UserName));
         }
     }
 }

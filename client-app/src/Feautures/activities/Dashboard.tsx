@@ -1,28 +1,51 @@
 import { Card,CardGroup,Button,Container,Grid,Image,Icon,Item,Label } from "semantic-ui-react";
 import { useStore } from "../../app/api/Stores/store";
 import { observer } from "mobx-react-lite";
-import { LoadingComponent } from '../../app/layouts/LoadingComponent';
+// import { LoadingComponent } from '../../app/layouts/LoadingComponent';
 import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ActivityFilter } from "./ActivityFilter"; 
+import  ActivityFilter from "./ActivityFilter"; 
 import { format } from "date-fns";
 import ActivityListParticipants from "./ActivityListParticipants";
+import { PagingParams } from "../../app/models/paginations";
+import { useState } from "react";
+import InfiniteScroll from 'react-infinite-scroller';
+import ActivityPlaceholder from "./ActivityPlaceholder";
 
 const Dashboard = () => {
     const { activityStore } = useStore();
-    const { LoadActivities,GroupedActivities } = activityStore;
+    const { LoadActivities,GroupedActivities,setPagingParams,pagination } = activityStore;
+    const [LoadingNext,setLoadingNext] = useState(false);
+
+    const GetNextItems = () => {
+        setLoadingNext(true)
+        setPagingParams(new PagingParams(pagination!.currentPage + 1))
+        LoadActivities().then(() => setLoadingNext(false))
+    }
 
     useEffect(() => {
        LoadActivities()
     },[LoadActivities])
 
-    if(activityStore.InitialLoading) return <LoadingComponent content='Loading Activities'/>
+    // if(activityStore.InitialLoading && !LoadingNext) return <LoadingComponent content='Loading Activities'/>
 
     return(
         <Grid>
             <Grid.Column width='10' style={{ marginTop: 50}}>
-                { GroupedActivities.map(([group,activities]) => (
-                    <Fragment>
+                { activityStore.InitialLoading && !LoadingNext ? 
+                 <>
+                  <ActivityPlaceholder/>
+                  <ActivityPlaceholder/>
+                 </>
+                  :
+                <InfiniteScroll
+                 pageStart={0}
+                 loadMore={GetNextItems}
+                 hasMore={!LoadingNext && !!pagination && pagination.currentPage < pagination.totalPages}
+                 initialLoad={false}
+                >
+                { GroupedActivities.map(([group,activities],index) => (
+                    <Fragment key={index}>
                           <h5 className='custom-font'>{ group }</h5>
                           <CardGroup>
                           { activities.map((activity:any) => (
@@ -120,6 +143,8 @@ const Dashboard = () => {
                     </CardGroup>
                     </Fragment>
                 ))}
+            </InfiniteScroll> 
+            }
             </Grid.Column>
             <Grid.Column width='6' style={{ marginTop: 50}}>
                 <ActivityFilter />

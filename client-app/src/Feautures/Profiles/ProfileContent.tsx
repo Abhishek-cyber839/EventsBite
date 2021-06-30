@@ -4,6 +4,7 @@ import ProfilePhotos from "./ProfilePhotos";
 import {observer} from "mobx-react-lite";
 import Followings from "./Followings";
 import { useStore } from "../../app/api/Stores/store";
+import ProfilActivities from "./ProfilActivities";
 
 interface Props{
     profile:Profile,
@@ -14,7 +15,7 @@ const ProfileContent = ({profile}:Props) => {
     "without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available."
     const panes = [
         { menuItem: 'About', render: () => <Tab.Pane className='custom-font'>{about}</Tab.Pane> },
-        { menuItem: 'Events', render: () => <Tab.Pane className='custom-font'>Tab 2 Content</Tab.Pane> },
+        { menuItem: 'Events', render: () => <Tab.Pane className='custom-font'><ProfilActivities/></Tab.Pane> },
         { menuItem: 'Photos', render: () => <Tab.Pane className='custom-font'><ProfilePhotos profile={profile}/></Tab.Pane> },
         { menuItem: 'Followers', render: () => <Tab.Pane loading={profileStore.LoadingFollowings} className='custom-font'><Followings/></Tab.Pane> },
         { menuItem: 'Following', render: () => <Tab.Pane loading={profileStore.LoadingFollowings} className='custom-font'><Followings/></Tab.Pane> },

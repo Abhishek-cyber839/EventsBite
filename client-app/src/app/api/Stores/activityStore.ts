@@ -1,5 +1,6 @@
 import { format } from "date-fns";
-import {  makeAutoObservable, runInAction } from "mobx";
+import {  makeAutoObservable, reaction, runInAction } from "mobx";
+import { Pagination, PagingParams } from '../../models/paginations';
 import { Activity, ActivityForm } from "../../models/activity";
 import { Profile } from "../../models/ActivityParticipant";
 import Agent from '../agent';
@@ -12,23 +13,78 @@ export default class ActivityStore {
     InitialLoading:boolean = true
     currentActivity:Activity | undefined = undefined
     editing:boolean = false;
+    pagination:Pagination | null = null
+    pagingParams = new PagingParams()
+    predicate = new Map().set('all',true)
 
     constructor() {
         makeAutoObservable(this)
+        reaction(
+            () => this.predicate.keys(), // obeserve the key changes
+            () => {
+                this.activityRegistry.clear()
+                this.pagingParams = new PagingParams()
+                this.LoadActivities()
+            }
+        )
     }
 
     LoadActivities = async () => {
         this.setInitialLoading(true)
         try{
-            const result = await Agent.CrudOperations.ActivitiesList()
-            result.forEach((activity:Activity) => {
+            const result = await Agent.CrudOperations.ActivitiesList(this.axiosParams)
+            result.data.data.forEach((activity:Activity) => {
                 this.SetActivity(activity)
             });
+            this.setPagination(result.data.pagination)
             this.setInitialLoading(false);
         }catch(error){
-            console.log(`Error Line 26 : ActivityStore.tsx \n ${error}`);
+            console.log(`Error Loading activities: ActivityStore.tsx \n ${error}`);
             this.setInitialLoading(false)
         }
+    }
+
+    setPagingParams = (pagingParams:PagingParams) => this.pagingParams = pagingParams;
+    setPagination = (pagination:Pagination) => this.pagination = pagination;
+    setPredicate = (key:string,value:string | Date) => {
+        const resetPredicate = () => {
+            this.predicate.forEach((value,key) => {
+                if(key !== 'startDate'){
+                    this.predicate.delete(key)
+                }
+            })
+        }
+        switch(key){
+            case 'all':
+                resetPredicate()
+                this.predicate.set('all',true)
+                break
+            case 'isGoing':
+                resetPredicate()
+                this.predicate.set('isGoing',true)
+                break
+            case 'isHosting':
+                resetPredicate()
+                this.predicate.set('isHosting',true)
+                break
+            case 'startDate':
+                this.predicate.delete('startDate')
+                this.predicate.set('startDate',value)
+        }
+    }
+
+    get axiosParams(){
+        const params = new URLSearchParams();
+        params.append('pageNumber',this.pagingParams.pageNumber.toString());
+        params.append('pageSize',this.pagingParams.pageSize.toString());
+        this.predicate.forEach((value,key) => {
+            if(key === 'startDate'){
+                params.append(key,(value as Date).toISOString());
+            }else{
+                params.append(key,value);
+            }
+        })
+        return params
     }
 
     setInitialLoading = (state:boolean) => this.InitialLoading = state 

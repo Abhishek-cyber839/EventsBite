@@ -1,4 +1,4 @@
-import { Photo, Profile } from "../../models/ActivityParticipant";
+import { Photo, Profile, UserActivity } from "../../models/ActivityParticipant";
 import { makeAutoObservable, reaction, runInAction } from "mobx";
 import Agent from "../agent";
 import { store } from "./store";
@@ -11,6 +11,7 @@ export class ProfileStore{
     followings:Profile[] = [];
     LoadingFollowings:boolean = false;
     ActiveTab:number = 0
+    userActivities:UserActivity[] = []
 
     constructor(){ 
         makeAutoObservable(this) 
@@ -145,6 +146,17 @@ export class ProfileStore{
         } catch (error) {
             console.log("Error Getting list of Followings:ListFollowings()\n",error.messgae)
             runInAction(() => this.LoadingFollowings = false)
+        }
+    }
+
+
+    LoadProfileActivities = async (username:string,predicate?:string) => {
+        try {
+            const activities:UserActivity[] = await Agent.Profiles.profileActivities(username,predicate!);
+            console.log(predicate! + " = \n" + activities)
+            runInAction(() => this.userActivities = activities as UserActivity[])
+        } catch (error) {
+            console.log("Error Getting profile activities:LoadProfileActivities()\n",error.messgae)
         }
     }
 }
