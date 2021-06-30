@@ -5,6 +5,7 @@ import {observer} from "mobx-react-lite";
 import Followings from "./Followings";
 import { useStore } from "../../app/api/Stores/store";
 import ProfilActivities from "./ProfilActivities";
+import ProfileAbout from "./ProfileAbout";
 
 interface Props{
     profile:Profile,
@@ -14,7 +15,7 @@ const ProfileContent = ({profile}:Props) => {
     const about = "In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface" + 
     "without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available."
     const panes = [
-        { menuItem: 'About', render: () => <Tab.Pane className='custom-font'>{about}</Tab.Pane> },
+        { menuItem: 'Manage', render: () => <ProfileAbout/> },
         { menuItem: 'Events', render: () => <ProfilActivities/> },
         { menuItem: 'Photos', render: () => <Tab.Pane className='custom-font'><ProfilePhotos profile={profile}/></Tab.Pane> },
         { menuItem: 'Followers', render: () => <Tab.Pane loading={profileStore.LoadingFollowings} className='custom-font'><Followings/></Tab.Pane> },
@@ -25,7 +26,7 @@ const ProfileContent = ({profile}:Props) => {
            <h3 className='custom-font'>
                Bio
            </h3>
-           <p>{about}</p>
+           <p>{profile.bio ? profile.bio : about}</p>
            <Tab panes={panes} onTabChange={(e,data) => profileStore.setActiveTab(data.activeIndex)}/>
         </>
     )

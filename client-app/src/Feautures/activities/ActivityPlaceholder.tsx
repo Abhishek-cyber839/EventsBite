@@ -1,31 +1,55 @@
 import { Fragment } from 'react';
-import { Segment, Placeholder } from 'semantic-ui-react';
+import { Segment, Placeholder,Grid } from 'semantic-ui-react';
 
 const ActivityPlaceholder = () => {
     return (
         <Fragment>
-            <Placeholder fluid style={{ marginTop: 25 }}>
-                <Segment.Group>
-                    <Segment style={{ minHeight: 110 }}>
-                        <Placeholder>
-                            <Placeholder.Header image>
-                                <Placeholder.Line />
-                                <Placeholder.Line />
-                            </Placeholder.Header>
-                            <Placeholder.Paragraph>
-                                <Placeholder.Line />
-                            </Placeholder.Paragraph>
-                        </Placeholder>
-                    </Segment>
-                    <Segment>
-                        <Placeholder>
-                            <Placeholder.Line />
-                            <Placeholder.Line />
-                        </Placeholder>
-                    </Segment>
-                    <Segment secondary style={{ minHeight: 70 }} />
-                </Segment.Group>
-            </Placeholder>
+            <Grid columns={1} stackable>
+            <Grid.Column>
+            <Segment raised>
+                <Placeholder>
+                <Placeholder.Header image>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                </Placeholder.Header>
+                <Placeholder.Paragraph>
+                    <Placeholder.Line length='medium' />
+                    <Placeholder.Line length='short' />
+                </Placeholder.Paragraph>
+                </Placeholder>
+            </Segment>
+            </Grid.Column>
+
+            <Grid.Column>
+            <Segment raised>
+                <Placeholder>
+                <Placeholder.Header image>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                </Placeholder.Header>
+                <Placeholder.Paragraph>
+                    <Placeholder.Line length='medium' />
+                    <Placeholder.Line length='short' />
+                </Placeholder.Paragraph>
+                </Placeholder>
+            </Segment>
+            </Grid.Column>
+
+            <Grid.Column>
+            <Segment raised>
+                <Placeholder>
+                <Placeholder.Header image>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                </Placeholder.Header>
+                <Placeholder.Paragraph>
+                    <Placeholder.Line length='medium' />
+                    <Placeholder.Line length='short' />
+                </Placeholder.Paragraph>
+                </Placeholder>
+            </Segment>
+            </Grid.Column>
+        </Grid>
         </Fragment>
     );
 };

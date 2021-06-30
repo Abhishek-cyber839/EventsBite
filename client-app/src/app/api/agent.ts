@@ -5,6 +5,7 @@ import { store } from "./Stores/store";
 import { history } from '../../../src/index'
 import { UserForm } from '../models/user'
 import { PaginatedResult } from "../models/paginations";
+import { Profile } from "../models/ActivityParticipant";
 
 
 axios.defaults.baseURL = "https://localhost:5001/api" // process.env.REACT_APP_API_URL;
@@ -118,7 +119,8 @@ const Profiles = {
     deletePhoto:(id:string) => requests.del(`/photos/${id}`),
     updateFollowings:(username:string) => requests.post(`/follow/${username}`,{}),
     getFollowingsList:(username:string,predicate:string) => requests.get(`/follow/${username}?predicate=${predicate}`),
-    profileActivities:(username:string,predicate:string) => requests.get(`/profile/${username}/activities?predicate=${predicate}`)
+    profileActivities:(username:string,predicate:string) => requests.get(`/profile/${username}/activities?predicate=${predicate}`),
+    updateProfile:(profile:Partial<Profile>) => requests.put('/profile',profile)
 }
 
 

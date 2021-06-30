@@ -160,4 +160,20 @@ export class ProfileStore{
             console.log("Error Getting profile activities:LoadProfileActivities()\n",error.messgae)
         }
     }
+
+    updateProfile = async (profile: Partial<Profile>) => {
+                this.Loading = true;
+                try {
+                    await Agent.Profiles.updateProfile(profile);
+                    runInAction(() => {
+                        if (profile.displayName && profile.displayName !== store.userStore.user?.displayName) {
+                            store.userStore.setDisplayName(profile.displayName);
+                        }
+                        this.profile = {...this.profile, ...profile as Profile};
+                        this.Loading = false;
+                    })
+                } catch (error) {
+                    console.log("Error updating profile :updateProfile()\n",error.message);
+                    runInAction(() => this.Loading = false);
+        } }
 }
