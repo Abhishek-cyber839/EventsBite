@@ -1,6 +1,6 @@
 import { Button, Card,Image } from "semantic-ui-react";
 import { Photo, Profile } from "../../app/models/ActivityParticipant";
-import {observer} from "mobx-react-lite";
+import { observer } from "mobx-react-lite";
 import { useStore } from "../../app/api/Stores/store";
 import { SyntheticEvent, useState } from "react";
 import ImageUpload from "../../app/common/ImageUpload";
@@ -8,7 +8,8 @@ import ImageUpload from "../../app/common/ImageUpload";
 interface Props{
     profile:Profile
 }
-const ProfilePhotos = ({profile}:Props) => {
+
+export default observer(function ProfilePhotos({profile}:Props){
     const { profileStore } = useStore();
     const { IsCurrentUser ,uploadPhoto,Uploading,Loading,setMain,deletePhoto } = profileStore;
     const [addPhotoMode,setaddPhotoMode] = useState(false);
@@ -26,7 +27,7 @@ const ProfilePhotos = ({profile}:Props) => {
         deletePhoto(photo)
     }
     return(
-        <> 
+        <div> 
            <Card.Group itemsPerRow={5}>
             { profile.photos?.map(photo => (
                 <Card
@@ -62,8 +63,8 @@ const ProfilePhotos = ({profile}:Props) => {
               fluid style={{ marginTop:20 }}>{addPhotoMode ? 'Cancel' : 'Upload New Photo' }</Button>
 
          }
-        </>
+        </div>
     )
-}
+})
 
-export default observer(ProfilePhotos);
+// export default observer(ProfilePhotos);

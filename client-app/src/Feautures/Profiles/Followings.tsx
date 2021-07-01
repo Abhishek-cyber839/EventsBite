@@ -3,17 +3,17 @@ import { useStore } from "../../app/api/Stores/store"
 import { Card,Button,Image,Header } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 
-const Followings = () => {
+export default observer(function Followings(){
     const { profileStore } = useStore();
     const { followings } = profileStore;
     return (
-        <> 
+        <div> 
             <Card.Group itemsPerRow={3}>
             { followings.length > 0 ? followings.map(profile => (
                     <Card
                     key={profile.userName}
                     >
-                    <>
+                    <div>
                             <Image src={profile.image ||  '/assets/user.jpeg'}/>
                             <Card.Content>
                                 <Card.Header className='custom-font'>{profile.displayName}</Card.Header>
@@ -34,21 +34,21 @@ const Followings = () => {
                                 style = {{ marginTop:5 }}
                                 color = 'orange'
                                 content = 'View profile'/>
-                        </>
+                        </div>
                     </Card>
                  )) :
-            <>
+            <div>
              <Header 
                   as='h5'
                   className='custom-font' 
                   style = {{ margin:10 }} 
                   textAlign='center' 
                   content={`You do not have any ${profileStore.ActiveTab === 4 ?  'followings':'followers'} to show`}/>
-            </>
+            </div>
         }
         </Card.Group>
-     </>
+     </div>
     )
-}
+})
 
-export default observer(Followings)
+// export default observer(Followings)

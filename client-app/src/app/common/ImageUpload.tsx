@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Step,Container,Grid, Button } from "semantic-ui-react";
 import PhotoUploadWidget from "./PhotoUploadWidget";
-import { Cropper } from 'react-cropper';
+// import { Cropper } from 'react-cropper';
 import PhotoCropperWidget from "./PhotoCropperWidget";
 
 interface Props{
@@ -9,7 +9,7 @@ interface Props{
     uploading:boolean
 }
 
-const ImageUpload = ({uploadPhoto,uploading}:Props) => {
+export default function ImageUpload({uploadPhoto,uploading}:Props){
     const [files,setFiles] = useState<any>([]);
     const [cropper,setCropper] = useState<Cropper>();
     const onCrop = () => {
@@ -64,4 +64,4 @@ const ImageUpload = ({uploadPhoto,uploading}:Props) => {
     )
 }
 
-export default ImageUpload;
+// export default ImageUpload;

@@ -60,7 +60,7 @@ namespace API
             });
             services.AddDbContext<DataContext>(opt =>
             {
-                opt.UseSqlite(_config.GetConnectionString("DefaultConnection"));
+                opt.UseNpgsql(_config.GetConnectionString("DefaultConnection"));
             });
             services.AddCors(opt => {
                 opt.AddPolicy("CorsPolicy",policy => {
@@ -136,6 +136,9 @@ namespace API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseCors("CorsPolicy");
 
            // we want our app to use authentication before autherization.
@@ -147,6 +150,7 @@ namespace API
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ChatHub>("/chat"); // requests coming to /chat will be handled by ChatHub.cs
+                endpoints.MapFallbackToController("Index","Fallback");
             });
         }
     }

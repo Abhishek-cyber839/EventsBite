@@ -3,7 +3,6 @@ import {Button, Grid, Header} from "semantic-ui-react";
 import { observer } from 'mobx-react-lite';
 import EditProfile from './EditProfile';
 
-
 const ProfileAbout = () => {
     const [editMode, setEditMode] = useState(false);
     return(
