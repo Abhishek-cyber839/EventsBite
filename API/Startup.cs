@@ -163,12 +163,36 @@ namespace API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionMiddleware>();
+            /* Add below Security Headers from NWebSec.AspNetCore.Middleware */
+            app.UseXContentTypeOptions();
+            app.UseReferrerPolicy(opt => opt.NoReferrer());
+            app.UseXXssProtection(opt => opt.EnabledWithBlockMode());
+            app.UseXfo(opt => opt.Deny());
+            app.UseCspReportOnly(opt =>          // Add Content-Support-Poilcy to see logs
+                                    opt.BlockAllMixedContent() // don't mix http content with https
+                                    .StyleSources(source => source.Self().CustomSources("https://fonts.googleapis.com")) 
+                                    /*We're okay with the data coming in any of these forms from 
+                                                                            our domain.*/
+                                    .FontSources(source => source.Self().CustomSources("https://fonts.gstatic.com","data:"))
+                                    .FormActions(source => source.Self())
+                                    .FrameAncestors(source => source.Self())
+                                    .ImageSources(source => source.Self().CustomSources("https://res.cloudinary.com"))
+                                    .ScriptSources(source => source.Self().CustomSources("sha256-njH5gZV+lCZO1X6WBffX57u0X2C6FerE4OkqX7Pyn2s=")) 
+            );
+
             if (env.IsDevelopment())
             {
                 // app.UseDeveloperExceptionPage(); use custom middleware instead from Line 61. 
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
+            
+            else
+                // add custom middleware
+                app.Use(async (context,next) => {
+                    context.Response.Headers.Add("Strict-Transport-Security","max-age=31536000");
+                    await next.Invoke();
+                });
 
             app.UseHttpsRedirection();
 
