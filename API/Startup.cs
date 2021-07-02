@@ -172,7 +172,7 @@ namespace API
                                     opt.BlockAllMixedContent() // don't mix http content with https
                                     .StyleSources(source => source.Self().CustomSources("https://fonts.googleapis.com")) 
                                     /*We're okay with the data coming in any of these forms from 
-                                                                            our domain.*/
+                                      our or any other custom domain.*/
                                     .FontSources(source => source.Self().CustomSources("https://fonts.gstatic.com","data:"))
                                     .FormActions(source => source.Self())
                                     .FrameAncestors(source => source.Self())
@@ -211,8 +211,12 @@ namespace API
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ChatHub>("/chat"); // requests coming to /chat will be handled by ChatHub.cs
-                endpoints.MapFallbackToController("Index","Fallback");
+                // endpoints.MapFallbackToController("Index","Fallback");
             });
         }
     }
 }
+
+
+// 947362e96c2dd5aa16dbcb4258121ee7 - secret
+// 828773424687688 - ID

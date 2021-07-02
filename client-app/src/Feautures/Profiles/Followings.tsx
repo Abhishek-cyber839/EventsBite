@@ -13,7 +13,7 @@ export default observer(function Followings(){
                     <Card
                     key={profile.userName}
                     >
-                    <div>
+                    <>
                             <Image src={profile.image ||  '/assets/user.jpeg'}/>
                             <Card.Content>
                                 <Card.Header className='custom-font'>{profile.displayName}</Card.Header>
@@ -34,7 +34,7 @@ export default observer(function Followings(){
                                 style = {{ marginTop:5 }}
                                 color = 'orange'
                                 content = 'View profile'/>
-                        </div>
+                        </>
                     </Card>
                  )) :
             <div>

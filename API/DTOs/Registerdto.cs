@@ -12,7 +12,7 @@ namespace API.DTOs
         public string Email { get; set; }
 
         [Required]
-        [RegularExpression("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$",ErrorMessage="Password too weak")]
+        [RegularExpression("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$",ErrorMessage="Password should contain,Lower,Upper and Symbol with only 4-8 characters.")]
         public string Password { get; set; }
 
         [Required]

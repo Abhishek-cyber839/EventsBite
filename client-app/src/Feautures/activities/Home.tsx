@@ -1,4 +1,4 @@
-import {Segment,Header,Container,Button} from 'semantic-ui-react'
+import {Segment,Header,Container,Button, Divider} from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../app/api/Stores/store'
@@ -10,9 +10,9 @@ const Home = () => {
     return(
         <Segment inverted textAlign='center' vertical className='masthead'>
             <Container text>
-                <h1 className='custom-font'>
-                Events
-                </h1>
+                <h3 className='custom-font'>
+                Take a  tour of EventsBite
+                </h3>
                 { userStore.IsLoggedIn ?  
                 (
                   <> 
@@ -28,6 +28,15 @@ const Home = () => {
                       </Button>
                       <Button onClick={() => modalStore.OpenModal(<RegisterForm/>)} size='small' basic inverted color='black' className='custom-font'>
                         REGISTER
+                      </Button>
+                      <Divider horizontal inverted>OR</Divider>
+                      <Button onClick={() => userStore.FacebookLogin()}
+                              basic 
+                              inverted 
+                              size='large'
+                              color='facebook' 
+                              className='custom-font'>
+                        FACEBOOK LOGIN
                       </Button>
                     </>
                 )

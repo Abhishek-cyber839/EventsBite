@@ -65,4 +65,11 @@ export default class UserStore{
     }
 
     setDisplayName = (name: string) => { if (this.user) this.user.displayName = name }
+
+    FacebookLogin = () => {
+        window.FB.login(resp => {
+            console.log(resp)
+            Agent.Account.fbLogin(resp.authResponse.accessToken).then((user) => console.log(user))
+        },{scope:'public_profile,email'})
+    }
 }
