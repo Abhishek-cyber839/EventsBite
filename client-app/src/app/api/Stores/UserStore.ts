@@ -6,6 +6,9 @@ import { store } from "./store";
 
 export default class UserStore{
     user: User | null = null
+    fbAccessToken:string | null = null
+    fbLoading = false
+
     constructor(){ makeAutoObservable(this) }
     // !! will cast user to boolean i.e if it is not null it will true.
     get IsLoggedIn(){ return !!this.user }
@@ -67,9 +70,37 @@ export default class UserStore{
     setDisplayName = (name: string) => { if (this.user) this.user.displayName = name }
 
     FacebookLogin = () => {
-        window.FB.login(resp => {
-            console.log(resp)
-            Agent.Account.fbLogin(resp.authResponse.accessToken).then((user) => console.log(user))
-        },{scope:'public_profile,email'})
+        this.fbLoading = true
+        const APILogin = (accessToken:string) => {
+            Agent.Account.fbLogin(accessToken).then((user) => {
+                store.commonStore.setToken(user.token)
+                runInAction(() => {
+                    this.user = user
+                    this.fbLoading = false
+                })
+                history.push("/activities")
+            }).catch((error) => {
+                console.log("Error Logging User with Facebook FacebookLogin():UserStore.ts\n",error.message);
+                runInAction(() => this.fbLoading = false)
+            })
+        }
+        if(this.fbAccessToken){
+            APILogin(this.fbAccessToken)
+        }
+        else
+            window.FB.login(resp => APILogin(resp.authResponse.accessToken),{scope:'public_profile,email'})
+        // window.FB.login(resp => {
+        //     console.log(resp)
+        //     Agent.Account.fbLogin(resp.authResponse.accessToken).then((user) => console.log(user))
+        // },{scope:'public_profile,email'})
+    }
+
+    FacebookLoginStatus = async () => {
+        window.FB.getLoginStatus((resp) => {
+            if(resp.status === 'connected'){
+                this.fbAccessToken = resp.authResponse.accessToken
+            }
+
+        })
     }
 }

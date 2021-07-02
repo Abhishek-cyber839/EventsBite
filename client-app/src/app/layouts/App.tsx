@@ -21,8 +21,11 @@ const App = () => {
   const location  = useLocation();
   const { commonStore, userStore } = useStore();
   useEffect(() => {
+    // check for token in local storage
     if(commonStore.token) userStore.getUserWithMatchingToken().finally(() => commonStore.setAppLoaded())
-    else commonStore.setAppLoaded()
+    else{
+      userStore.FacebookLoginStatus().then(() => commonStore.setAppLoaded())
+    } 
   },[commonStore, userStore])
 
   if(!commonStore.appLoaded) return <LoadingComponent content='Loading your app...'/>

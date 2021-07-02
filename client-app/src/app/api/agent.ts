@@ -8,7 +8,7 @@ import { PaginatedResult } from "../models/paginations";
 import { Profile } from "../models/ActivityParticipant";
 
 
-axios.defaults.baseURL = "https://localhost:5001/api"   //process.env.REACT_APP_API_URL
+axios.defaults.baseURL = process.env.REACT_APP_API_URL //"https://localhost:5001/api"
 
 /** Add delayLoading to axios.intereceptors to delay loading of activities */
 const delayLoading = (duration:number) => {

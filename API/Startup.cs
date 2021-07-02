@@ -170,14 +170,22 @@ namespace API
             app.UseXfo(opt => opt.Deny());
             app.UseCspReportOnly(opt =>          // Add Content-Support-Poilcy to see logs
                                     opt.BlockAllMixedContent() // don't mix http content with https
-                                    .StyleSources(source => source.Self().CustomSources("https://fonts.googleapis.com")) 
+                                    .StyleSources(source => source.Self().CustomSources(
+                                        "https://fonts.googleapis.com",
+                                        "sha256-oFySg82XYSNiSd+Q3yfYPD/rxY6RMDMJ0KxzGG74iGM=")) 
                                     /*We're okay with the data coming in any of these forms from 
                                       our or any other custom domain.*/
                                     .FontSources(source => source.Self().CustomSources("https://fonts.gstatic.com","data:"))
                                     .FormActions(source => source.Self())
                                     .FrameAncestors(source => source.Self())
-                                    .ImageSources(source => source.Self().CustomSources("https://res.cloudinary.com"))
-                                    .ScriptSources(source => source.Self().CustomSources("sha256-njH5gZV+lCZO1X6WBffX57u0X2C6FerE4OkqX7Pyn2s=")) 
+                                 //   .ImageSources(source => source.Self().CustomSources("https://res.cloudinary.com",
+                                 //                                                       "https://facebook.com",
+                                 //                                                       "https://platform-lookaside.fbsbx.com"))
+                                    // .ScriptSources(source => source.Self().CustomSources(
+                                    //     "sha256-njH5gZV+lCZO1X6WBffX57u0X2C6FerE4OkqX7Pyn2s=",
+                                    //     "https://connect.facebook.com",
+                                    //     "sha256-USrEpS/ZjLZ5SHyO7sJLckCT1nLL4G5isronnWQ1OJM=",
+                                    //     "sha256-njH5gZV+lCZO1X6WBffX57u0X2C6FerE4OkqX7Pyn2s=")) 
             );
 
             if (env.IsDevelopment())
@@ -211,7 +219,7 @@ namespace API
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ChatHub>("/chat"); // requests coming to /chat will be handled by ChatHub.cs
-                // endpoints.MapFallbackToController("Index","Fallback");
+                endpoints.MapFallbackToController("Index","Fallback");
             });
         }
     }
