@@ -73,6 +73,18 @@ Client/api | It has **api** for sending requests,**models**,**layout**,**stores*
 ## Caveat with Production version :
 This app is hosted on heroku at https://eventsbite.herokuapp.com/ but there is one missing functionality that you'll not find in the published version i.e whenever you'll go to any user's profile and click on 
 "Photos" or "Followers" or "Followings" tab to see their photos,followers and their followings, it will show you a blank page.These two feautures works
-fine in development mode but whenever it causes an issue whenever create minified verssion of react project.I've attached the screenshots of those features of how they should
-have been displayed on published version of the app.
+fine in development mode but whenever it causes an issue whenever create minified verssion of react project.
 
+**Photo Upload**
+
+![Follower](https://github.com/Abhishek-cyber839/EventsBite/blob/master/PhotoUpload.png)
+
+
+**Crop Image**
+
+![Follower](https://github.com/Abhishek-cyber839/EventsBite/blob/master/CropImage.png)
+
+
+**Followers/Following**
+
+![Follower](https://github.com/Abhishek-cyber839/EventsBite/blob/master/Follower.png)
