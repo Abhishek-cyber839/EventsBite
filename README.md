@@ -42,6 +42,18 @@ npm run build
 /* when production building */
 ```
 
+#### Use this testing user to login
+```
+Email : bob@test.com
+Password : Pa$$w0rd
+```
+For facebook login you can't use your own facebook account as they need to verify user accounts before we can use their api for authentication,therefore there's one testing user that you can use:
+```
+Name: Dick Algjbhbhcfghg Changstein
+Email: jpgnppdjss_1625191110@tfbnw.net
+UserId: 100070282836787
+```
+
 ## Production Build:
 Production build of react is located inside  ``` API/wwwroot/ ``` .I've also added a script inside package.json for build process ``` "build":" "rimraf ../API/wwwroot && mv build ../API/wwwroot " ``` , so whenever you'll make changes and try to 
 build newer version it will automatically remove the older verson of build from  ``` API/wwwroot/ ``` using the util **rimraf** and put newer version inside that folder.
