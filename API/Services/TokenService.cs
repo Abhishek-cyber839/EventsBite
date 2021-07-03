@@ -2,6 +2,7 @@ using Domain;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,12 +28,21 @@ namespace API.Services
             var credentials = new SigningCredentials(Key,SecurityAlgorithms.HmacSha512Signature);
             var tokenDescription = new SecurityTokenDescriptor{
                 Subject = new ClaimsIdentity(userClaims),
-                Expires = DateTime.Now.AddDays(7),
+                Expires = DateTime.UtcNow.AddMinutes(12),
                 SigningCredentials = credentials
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescription);
             return tokenHandler.WriteToken(token);
+        }
+
+        public RefreshToken GetRefreshToken(){
+            var randomNumber = new byte[32];
+            using var randomNumberGenerator = RandomNumberGenerator.Create();
+            randomNumberGenerator.GetBytes(randomNumber);
+            return new RefreshToken{
+                Token = Convert.ToBase64String(randomNumber)
+            };
         }
     }
 }

@@ -8,7 +8,7 @@ import { PaginatedResult } from "../models/paginations";
 import { Profile } from "../models/ActivityParticipant";
 
 
-axios.defaults.baseURL = process.env.REACT_APP_API_URL //"https://localhost:5001/api"
+axios.defaults.baseURL = process.env.REACT_APP_API_URL
 
 /** Add delayLoading to axios.intereceptors to delay loading of activities */
 const delayLoading = (duration:number) => {
@@ -35,7 +35,7 @@ axios.interceptors.response.use(async response => {
     }
     return response;
 },(error:AxiosError) => {
-    const {data,status,config} = error.response!;
+    const {data,status,config,headers} = error.response!;
     switch(status){
         case 400:
             /** 
@@ -59,7 +59,10 @@ axios.interceptors.response.use(async response => {
                 toast.error(data);        
             break;
         case 401:
-            toast.error("Unauthorized");
+            if(headers['www-autheticate']?.startsWith('Bearer error="invalid_token"')){
+               store.userStore.LogOut();
+               toast.error("Session-expired");
+            }
             break;
         case 404:
             toast.error("Not Found");
@@ -102,7 +105,10 @@ const Account = {
     currentUser: () => requests.get('/account'),
     loginUser: (user:UserForm) => requests.post('/account/login',user),
     registerUser: (user:UserForm) => requests.post('/account/register',user),
-    fbLogin:(accessToken:string) => requests.post(`/account/fblogin?accessToken=${accessToken}`,{})
+    fbLogin:(accessToken:string) => requests.post(`/account/fblogin?accessToken=${accessToken}`,{}),
+    refreshToken:() => requests.post('/account/refresh-token',{}),
+    verifyEmail:(token:string,email:string) => requests.post(`/account/verifyEmail?token=${token}&email=${email}`,{}),
+    resendVerificationEmail:(email:string) => requests.get(`/account/resend-email-verification?email=${email}`)
 }
 
 

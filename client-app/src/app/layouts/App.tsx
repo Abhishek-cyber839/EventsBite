@@ -16,6 +16,9 @@ import { LoadingComponent } from './LoadingComponent';
 import ModalContainer from '../common/ModalContainer';
 import Profile from '../../Feautures/Profiles/Profile';
 import PrivateRoute from './PrivateRoute';
+import RegSuccess from '../../Feautures/users/RegSuccess';
+import ConfirmEmail from '../../Feautures/users/ConfirmEmail';
+import { ToastContainer } from 'react-toastify';
 
 const App = () => {
   const location  = useLocation();
@@ -32,6 +35,7 @@ const App = () => {
   return (
     <>
       <ModalContainer />
+      <ToastContainer position='bottom-right' />
       <Route exact path="/" component={Home}/>
       <Route 
          path={'/(.+)'}
@@ -46,6 +50,8 @@ const App = () => {
                   <PrivateRoute path="/not-found-error"component={NotFound}/>
                   <PrivateRoute path="/server-error" component={ServerError}/>
                   <Route path="/login" component={LoginForm}/>
+                  <Route path="/account/registration-success" component={RegSuccess}/>
+                  <Route path="account/verifyEmail" component={ConfirmEmail}/>
                   <PrivateRoute path="/profiles/:username" component={Profile}/>
                 </Switch>
               </Container>

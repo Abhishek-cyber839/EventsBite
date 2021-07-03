@@ -14,15 +14,19 @@ const ProfileContent = ({profile}:Props) => {
     const { profileStore,userStore:{ user }  } = useStore()
     const about = "In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface" + 
     "without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available."
-    const panes = [
-        { menuItem: 'Manage', render: () => user?.userName === profile.userName ?  <ProfileAbout/> : <> </> },
+    let panes = [
+        { menuItem: 'Edit', render: () => user?.userName === profile.userName ?  <ProfileAbout/> : <> </> },
         { menuItem: 'Events', render: () => <ProfilActivities/> },
         { menuItem: 'Photos', render: () => <Tab.Pane className='custom-font'><ProfilePhotos profile={profile}/></Tab.Pane> },
         { menuItem: 'Followers', render: () => <Tab.Pane loading={profileStore.LoadingFollowings} className='custom-font'><Followings /></Tab.Pane> },
         { menuItem: 'Following', render: () => <Tab.Pane loading={profileStore.LoadingFollowings} className='custom-font'><Followings /></Tab.Pane> },
       ]
+
+    // if(user!.userName !== profile.userName)
+    //     panes.splice(0,1)
+
     return(
-        <div>
+        <div style={{ margin:10 }}>
            <h3 className='custom-font'>
                Bio
            </h3>

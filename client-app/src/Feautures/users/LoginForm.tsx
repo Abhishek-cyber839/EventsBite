@@ -9,7 +9,7 @@ const LoginForm = () => {
     return(
             <Formik
             initialValues={{ email:'',password:'',error:null}}
-            onSubmit={(values,{setErrors}) => userStore.LogIn(values).catch(error => setErrors({error:'Please correct Email Or Password.'})) }
+            onSubmit={(values,{setErrors}) => userStore.LogIn(values).catch(error => setErrors({error:error.response.data})) }
             >
                 {({handleSubmit, isSubmitting,errors}) => (
                     <Form className='ui form' onSubmit={handleSubmit}>
@@ -20,7 +20,7 @@ const LoginForm = () => {
                           name='error'
                           render={() => <Label style={{ marginBottom:10 }} pointing >{errors.error}</Label>}
                         />
-                        <Button loading={isSubmitting} positive content='LOG IN' type='submit' fluid/>
+                        <Button loading={isSubmitting} basic color='grey' content='LOG IN' type='submit' fluid/>
                     </Form>
                 )}
             </Formik>

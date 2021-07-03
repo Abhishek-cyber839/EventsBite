@@ -32,6 +32,7 @@ using Infrastructure.Security;
 using Infrastructure.Photos;
 using Microsoft.AspNetCore.SignalR;
 using API.SignalR;
+using Infrastructure.Email;
 
 namespace API
 {
@@ -102,7 +103,12 @@ namespace API
             services.AddCors(opt => {
                 opt.AddPolicy("CorsPolicy",policy => {
                     // .AllowAnyOrigin()
-                    policy.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("http://localhost:3000");
+                    policy
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .WithExposedHeaders("WWW-Authenticate","Pagination")
+                    .WithOrigins("http://localhost:3000");
                 });
             });
             services.AddMediatR(typeof(ListActivities.Handler).Assembly);
@@ -110,9 +116,12 @@ namespace API
 
             services.AddIdentityCore<User>(opt => {
                 opt.Password.RequireNonAlphanumeric = false;
+                opt.SignIn.RequireConfirmedEmail = true;
             })
             .AddEntityFrameworkStores<DataContext>()
-            .AddSignInManager<SignInManager<User>>();
+            .AddSignInManager<SignInManager<User>>()
+            .AddDefaultTokenProviders() ;
+            // create tokens to send with email so that users can verify that email addresses belong to them.
 
             // this key needs to match what what we've inside TokenService
             var Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["TokenKey"]));
@@ -123,7 +132,9 @@ namespace API
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = Key,
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
                 };
                 /** 
                 Add authentication for SignalR.
@@ -157,6 +168,7 @@ namespace API
             services.Configure<CloudinaryServices>(_config.GetSection("Cloudinary"));
             services.AddScoped<IPhotoAccessor,PhotoAccessor>();
             services.AddSignalR();
+            services.AddScoped<EmailSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

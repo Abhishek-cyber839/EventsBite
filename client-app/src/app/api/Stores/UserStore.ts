@@ -8,6 +8,7 @@ export default class UserStore{
     user: User | null = null
     fbAccessToken:string | null = null
     fbLoading = false
+    refreshTime:any
 
     constructor(){ makeAutoObservable(this) }
     // !! will cast user to boolean i.e if it is not null it will true.
@@ -17,6 +18,7 @@ export default class UserStore{
         try {
             const user = await Agent.Account.loginUser(credentials);
             store.commonStore.setToken(user.token)
+            this.StartRefreshTokenCountDwon(user)
             runInAction(() => {
                 this.user = user
             })
@@ -49,11 +51,13 @@ export default class UserStore{
     Register = async (credentials:UserForm) => {
         try {
             const user = await Agent.Account.registerUser(credentials);
-            store.commonStore.setToken(user.token)
-            runInAction(() => {
-                this.user = user
-            })
-            history.push('/activities')
+            // store.commonStore.setToken(user.token)
+            // this.StartRefreshTokenCountDwon(user)
+            // runInAction(() => {
+            //     this.user = user
+            // })
+            history.push(`/account/registration-success?email=${credentials.email}`)
+            // history.push('/activities')
             store.modalStore.CloseModal()
             console.log(user);
         } catch (error) {
@@ -74,6 +78,7 @@ export default class UserStore{
         const APILogin = (accessToken:string) => {
             Agent.Account.fbLogin(accessToken).then((user) => {
                 store.commonStore.setToken(user.token)
+                this.StartRefreshTokenCountDwon(user)
                 runInAction(() => {
                     this.user = user
                     this.fbLoading = false
@@ -103,4 +108,26 @@ export default class UserStore{
 
         })
     }
+
+    RefreshToken = async () => {
+        try {
+            const user = await Agent.Account.refreshToken();
+            runInAction(() => this.user = user)
+            this.StartRefreshTokenCountDwon(user)
+            store.commonStore.setToken(user.Token)
+        } catch (error) {
+            console.log("Error refreshing Token UserStore:RefreshToken()\n"+error.message);
+        }
+    }
+
+    private StartRefreshTokenCountDwon = (user:User) => {
+        // atob() will decode the token
+        const JwtToken = JSON.parse(atob(user.token.split('.')[1]))
+        const expires = new Date(JwtToken.exp * 1000)
+        // this will set our timeout value to 30s before our jwt token expires.
+        const timeout = expires.getTime() - Date.now() - (30 * 1000);
+        this.refreshTime =  setTimeout(this.RefreshToken, timeout);
+    }
+
+    private StopRefreshTokenCountDwon = () => clearTimeout(this.refreshTime)
 }

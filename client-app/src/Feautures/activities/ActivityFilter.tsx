@@ -9,7 +9,7 @@ const ActivityFilter = () => {
      return(
          <>
          <Menu vertical size='large' style={{ width:'100%',marginTop:25 }}>
-             <Header className='custom-font' icon='filter' attached content='Filter'/>
+             <Header className='custom-font' icon='search' attached content='Lookup'/>
              <Menu.Item 
               className='custom-font' 
               content="Events I'm Attending"
@@ -29,6 +29,7 @@ const ActivityFilter = () => {
               onClick={() => setPredicate('all','true')}
               />
          </Menu>
+         <Header className='custom-font' as='h5' textAlign='center' style={{ margin:30 }} content='Simply Filter By Date'/>
          <Calendar
           className='custom-font'
           onChange={(date) => setPredicate('startDate',date as Date)}

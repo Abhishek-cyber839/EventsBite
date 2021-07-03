@@ -31,7 +31,8 @@ const RegisterForm = () => {
                           name='error'
                           render={() => <ValidationErrors errors={errors.error}/>}
                         />
-                        <Button disabled={!isValid || !dirty || isSubmitting} loading={isSubmitting} positive content='REGISTER' type='submit' fluid/>
+                        <Button disabled={!isValid || !dirty || isSubmitting} loading={isSubmitting}
+                         basic color='grey' content='REGISTER' type='submit' fluid/>
                     </Form>
                 )}
             </Formik>

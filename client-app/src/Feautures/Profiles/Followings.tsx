@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 export default observer(function Followings(){
     const { profileStore } = useStore();
     const { followings } = profileStore;
+    
     return (
         <div> 
             <Card.Group itemsPerRow={3}>

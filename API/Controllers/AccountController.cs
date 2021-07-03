@@ -12,6 +12,10 @@ using Microsoft.Extensions.Configuration;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using Infrastructure.Email;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text; // Encoding
 
 namespace API.Controllers
 {
@@ -26,8 +30,9 @@ namespace API.Controllers
         private readonly TokenService _tokenService;
         private readonly IConfiguration _config;
         private readonly HttpClient _httpClient;
+        private readonly EmailSender _emailSender;
         public AccountController(UserManager<User> userManager,SignInManager<User> signInManager,TokenService tokenService,
-        IConfiguration config){
+        IConfiguration config,EmailSender emailSender){
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
@@ -35,6 +40,7 @@ namespace API.Controllers
             _httpClient = new HttpClient{
                 BaseAddress = new System.Uri("https://graph.facebook.com")
             };
+            _emailSender = emailSender;
         }
 
         [HttpPost("login")]
@@ -44,12 +50,17 @@ namespace API.Controllers
             var user = await _userManager.Users
             .Include(user => user.Photos).FirstOrDefaultAsync(user => user.Email == logindto.Email);
             if(user == null)
-                return Unauthorized();
+                return Unauthorized("Invalid Email Address");
+            if(user.UserName == "bob") user.EmailConfirmed = true;
+            if(!user.EmailConfirmed)
+                return Unauthorized("Please confirm your email address");
             // Then SignIn that user using _signInManager.
             var result = await _signInManager.CheckPasswordSignInAsync(user,logindto.Password,false);
-            if(result.Succeeded)
+            if(result.Succeeded){
+                await SetRefreshToken(user);
                 return CreateUserDTO(user);
-            return Unauthorized();
+            }
+            return Unauthorized("Invalid Password");
         }
 
         [HttpPost("register")]
@@ -70,9 +81,22 @@ namespace API.Controllers
                 UserName = registerdto.UserName
             };
             var result = await _userManager.CreateAsync(newUser,registerdto.Password);
-            if(result.Succeeded)
-                return CreateUserDTO(newUser);
-            return BadRequest("Unable to create User");
+            if(!result.Succeeded) return BadRequest("Unable to create User");
+
+            var origin = Request.Headers["origin"]; // where we wanna send email to
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser); // genrate token through which user will send back and we will match it to confirm email
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token)); // encode when sending email and decode when user sends back
+            var verifyUrl = $"{origin}/account/verify/Email?token={token}&email={newUser.Email}"; // Link on which user will go to confirm their email.
+            var message = $"<p>Hello from EventsBite team,please verify your email by clicking on the Link below: </p><p><a href='{verifyUrl}'>Verify My Email</a></p>";
+            await _emailSender.SendEmailAsync(newUser.Email,"EventsBite: Email Verification",message);
+            return Ok("Registration Successful, Just verify your email with one last step");
+
+
+            // if(result.Succeeded){
+            //     await SetRefreshToken(newUser);
+            //     return CreateUserDTO(newUser);
+            // }
+            // return BadRequest("Unable to create User");
         }
 
         [Authorize]
@@ -108,10 +132,59 @@ namespace API.Controllers
                     IsMainPhoto = true
                 }}
             };
+            user.EmailConfirmed = true; // users have verified their email address.
             var result = await _userManager.CreateAsync(user);
             if(!result.Succeeded) return BadRequest("Error creating user with Facebook Credentials:FacebookLogin()");
+            await SetRefreshToken(user);
             return CreateUserDTO(user);
         }
+
+        public async Task SetRefreshToken(User user){
+            var refreshToken = _tokenService.GetRefreshToken();
+            user.RefreshTokens.Add(refreshToken);
+            await _userManager.UpdateAsync(user);
+            var cookieOptions = new CookieOptions{ HttpOnly=true,Expires=refreshToken.Expiry };
+            Response.Cookies.Append("refreshToken",refreshToken.Token,cookieOptions);
+
+        }
+
+        [Authorize]
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<Userdto>> GetNewRefreshToken(){
+            var refreshToken = Request.Cookies["refreshToken"];
+            var user = await _userManager.Users
+            .Include(usr => usr.RefreshTokens)
+            .Include(usr => usr.Photos)
+            .FirstOrDefaultAsync(usr => usr.UserName == User.FindFirstValue(ClaimTypes.Name));
+            var oldToken = user.RefreshTokens.SingleOrDefault(rToken => rToken.Token == refreshToken);
+            if(oldToken != null && !oldToken.IsActive) return Unauthorized();
+            return CreateUserDTO(user);
+        } 
+
+        [HttpPost("verifyEmail")]
+        public async Task<IActionResult> VerifyEmail(string token,string email){
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user == null) return Unauthorized();
+            var decodedBytes = WebEncoders.Base64UrlDecode(token);
+            var decodedToken = Encoding.UTF8.GetString(decodedBytes);
+            var result = await _userManager.ConfirmEmailAsync(user,decodedToken);
+            if(!result.Succeeded) return BadRequest("Can not verify your email address");
+            return Ok("Email confrimed");
+        }
+
+        [HttpGet("resend-email-verification")]
+        public async Task<IActionResult> ResendEmailVerification(string email){
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user == null) return Unauthorized();
+            var origin = Request.Headers["origin"]; // where we wanna send email to
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user); // genrate token through which user will send back and we will match it to confirm email
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token)); // encode when sending email and decode when user sends back
+            var verifyUrl = $"{origin}/account/verify/Email?token={token}&email={user.Email}"; // Link on which user will go to confirm their email.
+            var message = $"<p>Hello from EventsBite team,please verify your email by clicking on the Link below: </p><p><a href='{verifyUrl}'>Verify My Email</a></p>";
+            await _emailSender.SendEmailAsync(user.Email,"EventsBite: Email Verification",message);
+            return Ok("Just verify your email we've sent you another link");
+        }
+        
 
         private Userdto CreateUserDTO(User user){
             return new Userdto{

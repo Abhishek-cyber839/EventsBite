@@ -34,7 +34,7 @@ const ProfileHeader = ({profile}:Props) => {
             <Grid  style={{ marginTop:10,marginBottom:10 }}>
                 <Grid.Column width={11} >
                     <> 
-                    <Image src={'/assets/background.jpeg'} fluid style={{ border:'none',height:'300px' }}/>
+                    <Image src={'/assets/background.jpeg'} fluid style={{ border:'none',height:'350px',borderRadius:10 }}/>
                     <ItemGroup style={BackgroundStyle}>
                         <Item>
                             <Item.Image avatar size='small' src={profile.image || '/assets/user.jpeg'}/>
@@ -65,7 +65,7 @@ const ProfileHeader = ({profile}:Props) => {
                                     color='blue'
                                     content= { profile.following ? 'Un Follow' : 'Follow'}
                                     className='custom-font'
-                                    style={{backgroundColor:'none',paddingLeft:15,paddingRight:15,width:'50%'}}
+                                    style={{backgroundColor:'none',paddingLeft:15,paddingRight:15,width:'50%',margin:10}}
                                    />
                                 }
                             </Item.Content>

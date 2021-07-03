@@ -5,7 +5,7 @@ import { observer } from "mobx-react-lite";
 
 const NavBar = () => {
     const { userStore } = useStore();
-    const { user ,LogOut } = userStore;
+    const { user ,LogOut,IsLoggedIn } = userStore;
     return(
         <Menu inverted fixed='top' style={{ marginDown:20}}> 
            <Container className='custom-font'>
@@ -13,22 +13,26 @@ const NavBar = () => {
                    <img src="/assets/Logo.png" alt="" style={{ marginRight:10 }}/>
                    Home
                </Menu.Item>
-               <Menu.Item name="Activities" as={NavLink} to='/activities'/>
-               <Menu.Item >
-                   <Button as={NavLink} to='/createActivity' className='custom-font' positive content="Create Activity"/>
-               </Menu.Item>
-               <Menu.Item position='right'>
-                   <Image src={user?.image || '/assets/user.jpeg'} avatar spaced='right'/>
-                   <Dropdown 
-                      pointing='top left'
-                      text={user?.displayName}
-                   >
-                       <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to={`/profiles/${user?.userName}`} text='Profile' icon='user'/>
-                        <Dropdown.Item onClick={LogOut} text='Log Out' icon='power'/>
-                       </Dropdown.Menu>
-                   </Dropdown>
-               </Menu.Item>
+               { IsLoggedIn && 
+                <>
+                <Menu.Item name="Activities" as={NavLink} to='/activities'/>
+                <Menu.Item >
+                    <Button as={NavLink} to='/createActivity' className='custom-font' positive content="Create Activity"/>
+                </Menu.Item>
+                <Menu.Item position='right'>
+                    <Image src={user?.image || '/assets/user.jpeg'} avatar spaced='right'/>
+                    <Dropdown 
+                        pointing='top left'
+                        text={user?.displayName}
+                    >
+                        <Dropdown.Menu>
+                            <Dropdown.Item as={Link} to={`/profiles/${user?.userName}`} text='Profile' icon='user'/>
+                            <Dropdown.Item onClick={LogOut} text='Log Out' icon='power'/>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Menu.Item> 
+               </> 
+               }
             </Container>
         </Menu>
     )
